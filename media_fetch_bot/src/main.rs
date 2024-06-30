@@ -10,6 +10,7 @@ pub mod bot_commands;
 pub mod bot_config;
 pub mod error;
 pub mod localization;
+pub mod tiktok;
 
 rust_i18n::i18n!("locales");
 
@@ -47,12 +48,22 @@ async fn handle_message(bot: Bot, msg: Message, bot_name: String) -> ResponseRes
     if let Ok(command) = BotCommand::parse(text, &bot_name) {
         handle_command(bot, msg, command).await
     } else {
+        let href = tiktok::get_href(msg.text().unwrap()).await;
+        let href = href.unwrap();
+        let _ = tiktok::download_file_by_link(&href);
+
+        bot.send_message(msg.chat.id,  &href).await?;
+        /*
         // Handle non-command messages
+        bot.send_message(msg.chat.id, msg.text().unwrap())
+            .parse_mode(ParseMode::Html).await?;
+
         bot.send_message(msg.chat.id,
                          t!(LocalizationCommand::CommandNotFound.into()))
             .parse_mode(ParseMode::Html).await?;
+         */
 
-        Ok(())
+        todo!()
     }
 }
 
