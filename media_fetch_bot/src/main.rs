@@ -1,10 +1,15 @@
 use std::process;
 use teloxide::{prelude::*, utils::command::BotCommands};
-use media_fetch_bot::bot_commands::BotCommand;
-use media_fetch_bot::bot_config::BotConfig;
-use media_fetch_bot::localization::LocalizationCommand;
+use crate::bot_commands::BotCommand;
+use crate::bot_config::BotConfig;
+use crate::localization::LocalizationCommand;
 use rust_i18n::t;
 use teloxide::types::ParseMode;
+
+pub mod bot_commands;
+pub mod bot_config;
+pub mod error;
+pub mod localization;
 
 rust_i18n::i18n!("locales");
 
