@@ -24,7 +24,6 @@ async fn main() {
 
     let bot_config = BotConfig::build().unwrap_or_else(|err| {
         log::error!("Error: {err}");
-        eprintln!("Error: {err}");
         process::exit(1);
     });
 
