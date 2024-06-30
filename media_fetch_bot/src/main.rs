@@ -1,6 +1,5 @@
 use std::process;
 use teloxide::prelude::*;
-use dotenvy::dotenv;
 use media_fetch_bot::config::Config;
 
 #[tokio::main]
