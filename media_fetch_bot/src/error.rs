@@ -7,4 +7,7 @@ pub enum BotError {
 
     #[error("Something wrong with .env BOT_TOKEN. May be, there's not field with this name.")]
     EnvBotToken,
+
+    #[error("Something wrong with .env BOT_NAME. May be, there's not field with this name.")]
+    EnvBotName,
 }
