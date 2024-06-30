@@ -1,5 +1,5 @@
 [package]
-name = "MediaFetchBot"
+name = "media_fetch_bot"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,3 +8,5 @@ teloxide = { version = "0.12", features = ["macros"] }
 log = "0.4"
 pretty_env_logger = "0.5.0"
 tokio = { version =  "1.8", features = ["rt-multi-thread", "macros"] }
+dotenvy = "0.15.7"
+thiserror = "1.0.61"
