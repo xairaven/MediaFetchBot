@@ -10,4 +10,7 @@ pub enum BotError {
 
     #[error("Something wrong with .env BOT_NAME. May be, there's no field with this name.")]
     EnvBotName,
+
+    #[error("Unfortunately, there's no result by this query.")]
+    NoResult,
 }
