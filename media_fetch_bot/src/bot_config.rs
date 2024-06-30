@@ -21,7 +21,6 @@ impl BotConfig {
         };
 
         // Loading bot name
-        // Loading token
         let name = match env::var("BOT_NAME") {
             Ok(value) => value,
             Err(_) => return Err(BotError::EnvBotName)
