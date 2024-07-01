@@ -1,17 +1,21 @@
-use std::process;
-use teloxide::{prelude::*, utils::command::BotCommands};
 use crate::bot_commands::BotCommand;
 use crate::bot_config::BotConfig;
+use crate::error::BotError;
+use crate::link_type::LinkType;
 use crate::localization::LocalizationCommand;
 use rust_i18n::t;
+use teloxide::{prelude::*, RequestError, utils::command::BotCommands};
 use teloxide::types::ParseMode;
+use std::process;
 
 pub mod bot_commands;
 pub mod bot_config;
 pub mod error;
+mod link_type;
 pub mod localization;
 pub mod tiktok;
 
+// Defining folder with locales. Path: media_fetch_bot/locales
 rust_i18n::i18n!("locales");
 
 #[tokio::main]
@@ -42,28 +46,30 @@ async fn main() {
 }
 
 async fn handle_message(bot: Bot, msg: Message, bot_name: String) -> ResponseResult<()> {
-    let text = msg.text().unwrap_or("");
+    let text = match msg.text() {
+        None => {
+            bot.send_message(msg.chat.id,
+                             t!(LocalizationCommand::EmptyMessage.into())).await?;
+            return Ok(());
+        }
+        Some(value) => value
+    };
 
     // Check if the message is a command
     if let Ok(command) = BotCommand::parse(text, &bot_name) {
         handle_command(bot, msg, command).await
     } else {
-        let href = tiktok::get_href(msg.text().unwrap()).await;
-        let href = href.unwrap();
-        let _ = tiktok::download_file_by_link(&href);
+        match text {
+            tiktok_link if tiktok_link.contains(LinkType::TikTok.into()) => {
+                tiktok::process_link(text.to_string()).await;
+            }
+            _ => {
+                bot.send_message(msg.chat.id,
+                                 t!(LocalizationCommand::LinkTypeUndefined.into())).await?;
+            }
+        }
 
-        bot.send_message(msg.chat.id,  &href).await?;
-        /*
-        // Handle non-command messages
-        bot.send_message(msg.chat.id, msg.text().unwrap())
-            .parse_mode(ParseMode::Html).await?;
-
-        bot.send_message(msg.chat.id,
-                         t!(LocalizationCommand::CommandNotFound.into()))
-            .parse_mode(ParseMode::Html).await?;
-         */
-
-        todo!()
+        Ok(())
     }
 }
 
