@@ -1,21 +1,16 @@
-use std::fs::File;
-use std::io;
-use std::io::Cursor;
 use crate::error::BotError;
+use crate::utils;
 use select::document::Document;
 use select::predicate::{Class, Name, Predicate};
 use serde_json::Value;
+use std::fs::File;
+use std::io;
+use std::io::Cursor;
 use reqwest::header;
-use crate::utils;
 
 pub async fn process_link(link: String, save_dir: String) -> Result<String, BotError> {
-    let href = get_href(&link).await;
-    let href = match href {
-        Ok(value) => value,
-        Err(err) => { return Err(err) }
-    };
-
-    let path = download_file_by_link(&href, &save_dir).await;
+    let href = get_href(&link).await?;
+    let path = download_file_by_link(&href, &save_dir).await?;
 
     Ok("".to_string())
     // bot.send_message(msg.chat.id,  &href).await?;
@@ -95,25 +90,32 @@ fn parse_response(response: String) -> Result<String, BotError> {
     }
 }
 
-pub async fn download_file_by_link(href: &str, save_dir: &str) -> String  {
-    let response = reqwest::get(href).await
-        .expect("request failed");
-    let body = response.bytes().await.expect("body invalid");
-    let mut cursor = Cursor::new(body);
+pub async fn download_file_by_link(href: &str, save_dir: &str) -> Result<String, BotError>  {
+    let response = reqwest::get(href).await;
+    let response = match response {
+        Ok(value) => value,
+        Err(_) => { return Err(BotError::FailedGetResponse); }
+    };
 
-    // let body = response.text().await
-    //     .expect("body invalid");
+    let body = response.bytes().await;
+    let body = match body {
+        Ok(value) => value,
+        Err(_) => { return Err(BotError::InvalidResult); }
+    };
+
+    let mut cursor = Cursor::new(body);
 
     let seed = utils::alphanumeric_string(8);
     let path = format!("{save_dir}/tiktok-{seed}.mp4");
 
-    let mut result_file = File::create(&path)
-        .expect("failed to create file");
+    let mut result_file = File::create(&path);
+    let mut result_file = match result_file {
+        Ok(value) => value,
+        Err(_) => { return Err(BotError::UnableToCreateFile); }
+    };
 
-    io::copy(&mut cursor, &mut result_file).expect("failed to copy content");
-    println!("Nice!");
-
-    path
-
-    todo!()
+    match io::copy(&mut cursor, &mut result_file) {
+        Ok(_) => Ok(path),
+        Err(_) => { return Err(BotError::UnableToCopyContent); }
+    }
 }
