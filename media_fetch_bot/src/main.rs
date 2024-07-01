@@ -64,8 +64,21 @@ async fn handle_message(bot: Bot, msg: Message, bot_name: String, save_dir: Stri
     } else {
         match text {
             tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
-                let file
+                let file_path
                     = tiktok::process_link(text.to_string(), save_dir).await;
+                let file_path = match file_path {
+                    Ok(value) => value,
+                    Err(err) => {
+                        let error_text = format!("{}\n\n<i>{}</i>",
+                                                 t!("error_text"), err.to_string());
+
+                        bot.send_message(msg.chat.id, error_text)
+                            .parse_mode(ParseMode::Html)
+                            .await?;
+
+                        return Ok(())
+                    }
+                };
             }
             _ => {
                 bot.send_message(msg.chat.id,
