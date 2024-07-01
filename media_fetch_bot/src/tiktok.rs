@@ -1,17 +1,21 @@
+use std::fs::File;
+use std::io;
+use std::io::Cursor;
 use crate::error::BotError;
 use select::document::Document;
 use select::predicate::{Class, Name, Predicate};
 use serde_json::Value;
 use reqwest::header;
+use crate::utils;
 
-pub async fn process_link(link: String) -> Result<String, BotError> {
+pub async fn process_link(link: String, save_dir: String) -> Result<String, BotError> {
     let href = get_href(&link).await;
     let href = match href {
         Ok(value) => value,
         Err(err) => { return Err(err) }
     };
 
-    // let _ = download_file_by_link(&href);
+    let path = download_file_by_link(&href, &save_dir).await;
 
     Ok("".to_string())
     // bot.send_message(msg.chat.id,  &href).await?;
@@ -91,8 +95,25 @@ fn parse_response(response: String) -> Result<String, BotError> {
     }
 }
 
-pub fn download_file_by_link(href: &str)  {
-    println!("{href}");
+pub async fn download_file_by_link(href: &str, save_dir: &str) -> String  {
+    let response = reqwest::get(href).await
+        .expect("request failed");
+    let body = response.bytes().await.expect("body invalid");
+    let mut cursor = Cursor::new(body);
+
+    // let body = response.text().await
+    //     .expect("body invalid");
+
+    let seed = utils::alphanumeric_string(8);
+    let path = format!("{save_dir}/tiktok-{seed}.mp4");
+
+    let mut result_file = File::create(&path)
+        .expect("failed to create file");
+
+    io::copy(&mut cursor, &mut result_file).expect("failed to copy content");
+    println!("Nice!");
+
+    path
 
     todo!()
 }
