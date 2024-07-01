@@ -1,10 +1,9 @@
 use crate::bot_commands::BotCommand;
 use crate::bot_config::BotConfig;
-use crate::error::BotError;
 use crate::link_type::LinkType;
 use crate::localization::LocalizationCommand;
 use rust_i18n::t;
-use teloxide::{prelude::*, RequestError, utils::command::BotCommands};
+use teloxide::{prelude::*, utils::command::BotCommands};
 use teloxide::types::ParseMode;
 use std::process;
 
@@ -14,6 +13,7 @@ pub mod error;
 mod link_type;
 pub mod localization;
 pub mod tiktok;
+pub mod utils;
 
 // Defining folder with locales. Path: media_fetch_bot/locales
 rust_i18n::i18n!("locales");
@@ -37,15 +37,18 @@ async fn main() {
     let bot = Bot::new(&bot_config.token);
 
     let bot_name = bot_config.name.clone();
+    let save_dir = bot_config.save_dir.clone();
 
     Dispatcher::builder(bot, Update::filter_message().endpoint(handle_message))
         .dependencies(dptree::deps![bot_name])
+        .dependencies(dptree::deps![save_dir])
         .build()
         .dispatch()
         .await;
 }
 
-async fn handle_message(bot: Bot, msg: Message, bot_name: String) -> ResponseResult<()> {
+async fn handle_message(bot: Bot, msg: Message, bot_name: String, save_dir: String)
+    -> ResponseResult<()> {
     let text = match msg.text() {
         None => {
             bot.send_message(msg.chat.id,
@@ -61,7 +64,8 @@ async fn handle_message(bot: Bot, msg: Message, bot_name: String) -> ResponseRes
     } else {
         match text {
             tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
-                let file = tiktok::process_link(text.to_string()).await;
+                let file
+                    = tiktok::process_link(text.to_string(), save_dir).await;
             }
             _ => {
                 bot.send_message(msg.chat.id,
