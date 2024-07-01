@@ -60,8 +60,8 @@ async fn handle_message(bot: Bot, msg: Message, bot_name: String) -> ResponseRes
         handle_command(bot, msg, command).await
     } else {
         match text {
-            tiktok_link if tiktok_link.contains(LinkType::TikTok.into()) => {
-                tiktok::process_link(text.to_string()).await;
+            tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
+                let file = tiktok::process_link(text.to_string()).await;
             }
             _ => {
                 bot.send_message(msg.chat.id,

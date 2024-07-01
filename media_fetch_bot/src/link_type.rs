@@ -1,7 +1,14 @@
-use strum_macros::{Display, EnumString, IntoStaticStr};
+use std::fmt;
+use std::fmt::{Display, Formatter};
 
-#[derive(Display, EnumString, IntoStaticStr)]
 pub enum LinkType {
-    #[strum(serialize = "tiktok.com")]
     TikTok,
+}
+
+impl Display for LinkType {
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        match *self {
+            LinkType::TikTok => write!(f, "tiktok.com"),
+        }
+    }
 }
