@@ -12,8 +12,7 @@ pub async fn process_link(link: String, save_dir: String) -> Result<String, BotE
     let href = get_href(&link).await?;
     let path = download_file_by_link(&href, &save_dir).await?;
 
-    Ok("".to_string())
-    // bot.send_message(msg.chat.id,  &href).await?;
+    Ok(path)
 }
 
 pub async fn get_href(url: &str) -> Result<String, BotError> {
@@ -108,7 +107,7 @@ pub async fn download_file_by_link(href: &str, save_dir: &str) -> Result<String,
     let seed = utils::alphanumeric_string(8);
     let path = format!("{save_dir}/tiktok-{seed}.mp4");
 
-    let mut result_file = File::create(&path);
+    let result_file = File::create(&path);
     let mut result_file = match result_file {
         Ok(value) => value,
         Err(_) => { return Err(BotError::UnableToCreateFile); }
