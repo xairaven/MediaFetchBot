@@ -5,7 +5,7 @@ use crate::localization::LocalizationCommand;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
 use teloxide::types::{InputFile, ParseMode};
-use std::process;
+use std::{fs, process};
 
 pub mod bot_commands;
 pub mod bot_config;
@@ -48,7 +48,7 @@ async fn main() {
 }
 
 async fn handle_message(bot: Bot, msg: Message, bot_name: String, save_dir: String)
-    -> ResponseResult<()> {
+                        -> ResponseResult<()> {
     let text = match msg.text() {
         None => {
             bot.send_message(msg.chat.id,
@@ -67,11 +67,13 @@ async fn handle_message(bot: Bot, msg: Message, bot_name: String, save_dir: Stri
                 let file_path
                     = tiktok::process_link(text.to_string(), &save_dir).await;
                 match file_path {
-                    Ok(value) => {
-                        let file = InputFile::file(value);
+                    Ok(file_path) => {
+                        let file = InputFile::file(&file_path);
 
-                       bot.send_video(msg.chat.id, file).await?
-                    },
+                        bot.send_video(msg.chat.id, file).await?;
+
+                        let _ = fs::remove_file(file_path);
+                    }
                     Err(err) => {
                         let error_text = format!("{}\n\n<i>{}</i>",
                                                  t!("error_text"), err.to_string());
@@ -80,7 +82,7 @@ async fn handle_message(bot: Bot, msg: Message, bot_name: String, save_dir: Stri
                             .parse_mode(ParseMode::Html)
                             .await?;
 
-                        return Ok(())
+                        return Ok(());
                     }
                 };
             }
