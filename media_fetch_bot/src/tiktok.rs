@@ -8,9 +8,9 @@ use std::io;
 use std::io::Cursor;
 use reqwest::header;
 
-pub async fn process_link(link: String, save_dir: String) -> Result<String, BotError> {
+pub async fn process_link(link: String, save_dir: &str) -> Result<String, BotError> {
     let href = get_href(&link).await?;
-    let path = download_file_by_link(&href, &save_dir).await?;
+    let path = download_file_by_link(&href, save_dir).await?;
 
     Ok(path)
 }

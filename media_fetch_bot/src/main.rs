@@ -4,7 +4,7 @@ use crate::link_type::LinkType;
 use crate::localization::LocalizationCommand;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
-use teloxide::types::ParseMode;
+use teloxide::types::{InputFile, ParseMode};
 use std::process;
 
 pub mod bot_commands;
@@ -65,9 +65,13 @@ async fn handle_message(bot: Bot, msg: Message, bot_name: String, save_dir: Stri
         match text {
             tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
                 let file_path
-                    = tiktok::process_link(text.to_string(), save_dir).await;
-                let file_path = match file_path {
-                    Ok(value) => value,
+                    = tiktok::process_link(text.to_string(), &save_dir).await;
+                match file_path {
+                    Ok(value) => {
+                        let file = InputFile::file(value);
+
+                       bot.send_video(msg.chat.id, file).await?
+                    },
                     Err(err) => {
                         let error_text = format!("{}\n\n<i>{}</i>",
                                                  t!("error_text"), err.to_string());

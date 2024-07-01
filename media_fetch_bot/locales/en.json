@@ -5,5 +5,5 @@
   "empty_message": "Empty message. Please, read instruction: /help",
   "link_type_undefined": "Link type undefined. Please, read instruction: /help",
 
-  "error_text": "<b>Error message:</b>\n\nSomething is wrong either with the link or with the server.\nPlease report this incident to the bot administrator (@xairaven)."
+  "error_text": "<b>Error message:</b>\nSomething is wrong either with the link or with the server.\nPlease report this incident to the bot administrator (@xairaven)."
 }
