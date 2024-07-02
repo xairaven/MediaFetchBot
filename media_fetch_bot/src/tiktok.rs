@@ -1,18 +1,23 @@
 use crate::error::BotError;
-use crate::utils;
 use select::document::Document;
 use select::predicate::{Class, Name, Predicate};
 use serde_json::Value;
-use std::fs::File;
-use std::io;
-use std::io::Cursor;
-use reqwest::header;
+use reqwest::{header};
+use url::{ParseError, Url};
+use teloxide::types::InputFile;
 
-pub async fn process_link(link: String, save_dir: &str) -> Result<String, BotError> {
+pub async fn process_link(link: String) -> Result<InputFile, BotError> {
     let href = get_href(&link).await?;
-    let path = download_file_by_link(&href, save_dir).await?;
 
-    Ok(path)
+    let url : Result<Url, ParseError> = href.parse();
+    let url = match url {
+        Ok(value) => value,
+        Err(_) => { return Err(BotError::FailedParseUrl); }
+    };
+
+    let file = InputFile::url(url);
+
+    Ok(file)
 }
 
 pub async fn get_href(url: &str) -> Result<String, BotError> {
@@ -86,35 +91,5 @@ fn parse_response(response: String) -> Result<String, BotError> {
         }
     } else {
         Err(BotError::NoResult)
-    }
-}
-
-pub async fn download_file_by_link(href: &str, save_dir: &str) -> Result<String, BotError>  {
-    let response = reqwest::get(href).await;
-    let response = match response {
-        Ok(value) => value,
-        Err(_) => { return Err(BotError::FailedGetResponse); }
-    };
-
-    let body = response.bytes().await;
-    let body = match body {
-        Ok(value) => value,
-        Err(_) => { return Err(BotError::InvalidResult); }
-    };
-
-    let mut cursor = Cursor::new(body);
-
-    let seed = utils::alphanumeric_string(8);
-    let path = format!("{save_dir}/tiktok-{seed}.mp4");
-
-    let result_file = File::create(&path);
-    let mut result_file = match result_file {
-        Ok(value) => value,
-        Err(_) => { return Err(BotError::UnableToCreateFile); }
-    };
-
-    match io::copy(&mut cursor, &mut result_file) {
-        Ok(_) => Ok(path),
-        Err(_) => { return Err(BotError::UnableToCopyContent); }
     }
 }

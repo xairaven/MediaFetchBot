@@ -26,15 +26,12 @@ pub enum BotError {
     #[error("FailedParseResponse: Failed to parse response.")]
     FailedParseResponse,
 
+    #[error("FailedParseUrl: Failed to parse final url.")]
+    FailedParseUrl,
+
     #[error("InvalidResult: All steps done, but result is invalid.")]
     InvalidResult,
 
     #[error("NoResult: Unfortunately, there's no result by this query.")]
     NoResult,
-
-    #[error("UnableToCreateFile: Server problem, unable to create file for downloading.")]
-    UnableToCreateFile,
-
-    #[error("UnableToCopyContent: Server problem, failed to copy content.")]
-    UnableToCopyContent,
 }

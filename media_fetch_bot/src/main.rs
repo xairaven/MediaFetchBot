@@ -4,8 +4,8 @@ use crate::link_type::LinkType;
 use crate::localization::LocalizationCommand;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
-use teloxide::types::{InputFile, ParseMode};
-use std::{fs, process};
+use teloxide::types::{ParseMode};
+use std::{process};
 
 pub mod bot_commands;
 pub mod bot_config;
@@ -37,17 +37,15 @@ async fn main() {
     let bot = Bot::new(&bot_config.token);
 
     let bot_name = bot_config.name.clone();
-    let save_dir = bot_config.save_dir.clone();
 
     Dispatcher::builder(bot, Update::filter_message().endpoint(handle_message))
         .dependencies(dptree::deps![bot_name])
-        .dependencies(dptree::deps![save_dir])
         .build()
         .dispatch()
         .await;
 }
 
-async fn handle_message(bot: Bot, msg: Message, bot_name: String, save_dir: String)
+async fn handle_message(bot: Bot, msg: Message, bot_name: String)
                         -> ResponseResult<()> {
     let text = match msg.text() {
         None => {
@@ -64,15 +62,11 @@ async fn handle_message(bot: Bot, msg: Message, bot_name: String, save_dir: Stri
     } else {
         match text {
             tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
-                let file_path
-                    = tiktok::process_link(text.to_string(), &save_dir).await;
-                match file_path {
-                    Ok(file_path) => {
-                        let file = InputFile::file(&file_path);
-
-                        bot.send_video(msg.chat.id, file).await?;
-
-                        let _ = fs::remove_file(file_path);
+                let input_file_result
+                    = tiktok::process_link(text.to_string()).await;
+                match input_file_result {
+                    Ok(input_file) => {
+                        bot.send_video(msg.chat.id, input_file).await?;
                     }
                     Err(err) => {
                         let error_text = format!("{}\n\n<i>{}</i>",
