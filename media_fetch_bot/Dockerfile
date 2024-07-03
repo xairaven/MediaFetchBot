@@ -1,11 +1,11 @@
 FROM rust:1.79.0 AS builder
 
 WORKDIR /usr/src/app
-COPY media_fetch_bot/src ./src
-COPY media_fetch_bot/locales ./locales
-COPY media_fetch_bot/.env ./
-COPY media_fetch_bot/Cargo.lock ./
-COPY media_fetch_bot/Cargo.toml ./
+COPY src ./src
+COPY locales ./locales
+COPY .env ./
+COPY Cargo.lock ./
+COPY Cargo.toml ./
 
 RUN cargo fetch
 RUN cargo build --release
@@ -18,8 +18,6 @@ RUN apt update && apt install -y \
 
 COPY --from=builder /usr/src/app/target/release/media_fetch_bot /usr/local/bin/
 COPY --from=builder /usr/src/app/.env /usr/local/bin/
-
-CMD ["ls", "-l"]
 
 WORKDIR /usr/local/bin
 ENTRYPOINT ["media_fetch_bot"]
