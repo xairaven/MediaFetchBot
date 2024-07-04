@@ -5,6 +5,7 @@ use crate::error::BotError;
 pub struct BotConfig {
     pub token: String,
     pub name: String,
+    pub tiktok_api_key: Option<String>,
 }
 
 impl BotConfig {
@@ -26,10 +27,17 @@ impl BotConfig {
             Err(_) => return Err(BotError::EnvBotName)
         };
 
+        // Loading tiktok_api_key
+        let tiktok_api_key = match env::var("TIKTOK_API_KEY") {
+            Ok(value) => Some(value),
+            Err(_) => None
+        };
+
         // Returning Config var
         Ok(BotConfig {
             token,
             name,
+            tiktok_api_key,
         })
     }
 }

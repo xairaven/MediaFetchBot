@@ -37,16 +37,18 @@ async fn main() {
     let bot = Bot::new(&bot_config.token);
 
     let bot_name = bot_config.name.clone();
+    let tiktok_key = bot_config.tiktok_api_key.clone();
 
     Dispatcher::builder(bot, Update::filter_message().endpoint(handle_message))
-        .dependencies(dptree::deps![bot_name])
+        .dependencies(dptree::deps![bot_name, tiktok_key])
         .build()
         .dispatch()
         .await;
 }
 
-async fn handle_message(bot: Bot, msg: Message, bot_name: String)
-                        -> ResponseResult<()> {
+async fn handle_message(bot: Bot, msg: Message,
+                        bot_name: String,
+                        tiktok_api_key: Option<String>) -> ResponseResult<()> {
     let text = match msg.text() {
         None => {
             bot.send_message(msg.chat.id,
@@ -63,7 +65,7 @@ async fn handle_message(bot: Bot, msg: Message, bot_name: String)
         match text {
             tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
                 let input_file_result
-                    = tiktok::process_link(text.to_string()).await;
+                    = tiktok::process_link(&tiktok_api_key, text.to_string()).await;
                 match input_file_result {
                     Ok(input_file) => {
                         bot.send_video(msg.chat.id, input_file).await?;
