@@ -5,7 +5,8 @@ use reqwest::header::{HeaderValue};
 use url::{ParseError, Url};
 use teloxide::types::{InputFile};
 
-pub async fn process_link(tiktok_api_key: &Option<String>, link: String) -> Result<InputFile, BotError> {
+pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
+    -> Result<(String, Vec<InputFile>), BotError> {
     let tiktok_api_key : &str = match tiktok_api_key {
         None => { return Err(BotError::ApiKeyTiktokMissing)},
         Some(value) => value
@@ -17,17 +18,24 @@ pub async fn process_link(tiktok_api_key: &Option<String>, link: String) -> Resu
         Err(_) => { return Err(BotError::FailedGetResponse) }
     };
 
-    let href = parse_response(response)?;
+    let response_results = parse_response(response)?;
+    let mut files : Vec<InputFile> = vec![];
 
-    let url : Result<Url, ParseError> = href.parse();
-    let url = match url {
-        Ok(value) => value,
-        Err(_) => { return Err(BotError::FailedParseUrl); }
-    };
+    // Parsing vector of results
+    let response_documents = response_results.1;
+    for href in response_documents {
+        let url : Result<Url, ParseError> = href.parse();
+        let url = match url {
+            Ok(value) => value,
+            Err(_) => { return Err(BotError::FailedParseUrl); }
+        };
 
-    let file = InputFile::url(url);
+        let file = InputFile::url(url);
 
-    Ok(file)
+        files.push(file);
+    }
+
+    Ok((response_results.0, files))
 }
 
 async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<dyn std::error::Error>> {
@@ -55,18 +63,35 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<
     Ok(response)
 }
 
-fn parse_response(response: String) -> Result<String, BotError> {
+fn parse_response(response: String) -> Result<(String, Vec<String>), BotError> {
     let parsed_response : serde_json::error::Result<Value> = serde_json::from_str(&response);
     let parsed_response = match parsed_response {
         Ok(value) => value,
         Err(_) => { return Err(BotError::FailedParseResponse) }
     };
 
+    let mut results : Vec<String> = vec![];
+
     let data = &parsed_response["data"];
 
-    let link = &data["play"];
-    match link {
-        Value::String(value) => Ok(value.to_string()),
-        _ => Err(BotError::NoResult)
+    let title : String = match &data["title"] {
+        Value::String(value) => value.to_string(),
+        _ => String::new()
+    };
+
+    let play = match &data["play"] {
+        Value::String(value) => value.to_string(),
+        _ => { return Err(BotError::NoResult); }
+    };
+    results.push(play);
+
+    if let Value::Array(vector) = &data["images"] {
+        for value in vector {
+            if let Value::String(link) = value {
+                results.push(link.to_string());
+            }
+        }
     }
+
+    Ok((title, results))
 }

@@ -64,11 +64,20 @@ async fn handle_message(bot: Bot, msg: Message,
     } else {
         match text {
             tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
-                let input_file_result
+                let results
                     = tiktok::process_link(&tiktok_api_key, text.to_string()).await;
-                match input_file_result {
-                    Ok(input_file) => {
-                        bot.send_video(msg.chat.id, input_file).await?;
+                match results {
+                    Ok(tuple) => {
+                        let title = tuple.0;
+                        let files = tuple.1;
+
+                        for file in files {
+                            bot.send_document(msg.chat.id, file).await?;
+                        }
+
+                        if !title.is_empty() {
+                            bot.send_message(msg.chat.id, title).await?;
+                        }
                     }
                     Err(err) => {
                         let error_text = format!("{}\n\n<i>{}</i>",
