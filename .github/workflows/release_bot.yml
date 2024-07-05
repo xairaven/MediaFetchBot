@@ -2,8 +2,6 @@ name: release_bot
 
 on:
   push:
-    branches:
-      - release
     tags:
       - "*"
 
