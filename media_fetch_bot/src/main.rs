@@ -65,7 +65,7 @@ async fn handle_message(bot: Bot, msg: Message,
         match text {
             tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
                 let results
-                    = tiktok::process_link(&tiktok_api_key, text.to_string()).await;
+                    = tiktok::handler::process_link(&tiktok_api_key, text.to_string()).await;
                 match results {
                     Ok(tuple) => {
                         let title = tuple.0;
