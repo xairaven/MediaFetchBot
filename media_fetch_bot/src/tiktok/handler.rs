@@ -42,7 +42,7 @@ pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
             MediaFormat::Video => { InputMedia::Video(InputMediaVideo::new(file)) }
         };
 
-        let vector = files.entry(raw_media.format).or_insert(Vec::new());
+        let vector = files.entry(raw_media.format).or_default();
         vector.push(file);
     }
 

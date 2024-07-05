@@ -13,7 +13,6 @@ pub mod error;
 mod link_type;
 pub mod localization;
 pub mod tiktok;
-pub mod utils;
 
 // Defining folder with locales. Path: media_fetch_bot/locales
 rust_i18n::i18n!("locales");
@@ -86,7 +85,7 @@ async fn handle_message(bot: Bot, msg: Message,
                     }
                     Err(err) => {
                         let error_text = format!("{}\n\n<i>{}</i>",
-                                                 t!("error_text"), err.to_string());
+                                                 t!("error_text"), err);
 
                         bot.send_message(msg.chat.id, &error_text)
                             .parse_mode(ParseMode::Html)
