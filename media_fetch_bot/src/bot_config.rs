@@ -11,7 +11,7 @@ pub struct BotConfig {
 impl BotConfig {
     pub fn build() -> Result<BotConfig, BotError> {
         // Loading .env from the parent folder
-        if let Err(_) = dotenv() {
+        if dotenv().is_err() {
             return Err(BotError::EnvIsNotLoaded);
         }
 
