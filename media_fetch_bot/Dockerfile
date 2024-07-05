@@ -1,5 +1,6 @@
 FROM rust:1.79.0 AS builder
 
+# Copying code + .env
 WORKDIR /usr/src/app
 COPY src ./src
 COPY locales ./locales
@@ -7,20 +8,38 @@ COPY .env ./
 COPY Cargo.lock ./
 COPY Cargo.toml ./
 
+# BUILD
 RUN cargo fetch
 RUN cargo build --release
 
+# Runner image
 FROM debian:bookworm-slim
+
+# Essential packages
 RUN apt update && apt install -y \
     libssl-dev \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /usr/src/app/target/release/media_fetch_bot /usr/local/bin/
+########################################################
+# ENV VARIABLES
+
+# Log level. Error, warn, info, debug, trace, off.
+# Can also be "main" or "your_app_name" (same values)
+ENV RUST_LOG=info
+
+# Your app name (write same name to both)
+ARG APP_NAME_ARG=media_fetch_bot
+ENV APP_NAME_ENV=media_fetch_bot
+
+########################################################
+
+# Copying built executable from builder to runner
+COPY --from=builder /usr/src/app/target/release/${APP_NAME_ARG} /usr/local/bin/
 COPY --from=builder /usr/src/app/.env /usr/local/bin/
 
+# Workdir on runner
 WORKDIR /usr/local/bin
-ENTRYPOINT ["media_fetch_bot"]
 
-# Optionally, specify a command to run the bot
-CMD ["media_fetch_bot"]
+# Use the exec form of ENTRYPOINT with a shell to expand environment variables
+ENTRYPOINT "./$APP_NAME_ENV"
