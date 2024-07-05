@@ -1,12 +1,12 @@
-use std::collections::HashMap;
 use crate::error::BotError;
-use serde_json::Value;
-use reqwest::{header};
-use reqwest::header::{HeaderValue};
-use url::{ParseError, Url};
-use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
 use crate::tiktok::media_format::MediaFormat;
 use crate::tiktok::raw_media::RawMedia;
+use reqwest::{header};
+use reqwest::header::{HeaderValue};
+use serde_json::Value;
+use std::collections::HashMap;
+use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
+use url::{ParseError, Url};
 
 pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
                           -> Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), BotError> {
@@ -22,7 +22,7 @@ pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
     };
 
     let response_results = parse_response(response)?;
-    let mut files: HashMap<MediaFormat, Vec<InputMedia>>  = HashMap::new();
+    let mut files: HashMap<MediaFormat, Vec<InputMedia>> = HashMap::new();
 
     // Parsing vector of results
     let response_documents = response_results.1;
@@ -95,6 +95,9 @@ fn parse_response(response: String) -> Result<(String, Vec<RawMedia>), BotError>
         _ => { return Err(BotError::NoResult); }
     };
 
+    // Supposing that if there "images" field -- then, it's photo-slide format.
+    // So, "play" field -- link to mp3 music.
+    // Otherwise -- link to mp4 video. No "images" field.
     if let Value::Array(vector) = &data["images"] {
         results.push(RawMedia::new(play, MediaFormat::Music));
 

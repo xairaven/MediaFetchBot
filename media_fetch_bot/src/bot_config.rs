@@ -1,6 +1,6 @@
-use std::env;
-use dotenvy::dotenv;
 use crate::error::BotError;
+use dotenvy::dotenv;
+use std::env;
 
 pub struct BotConfig {
     pub token: String,

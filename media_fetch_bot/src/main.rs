@@ -67,6 +67,9 @@ async fn handle_message(bot: Bot, msg: Message,
                     = tiktok::handler::process_link(&tiktok_api_key, text.to_string()).await;
                 match results {
                     Ok(tuple) => {
+                        // This hashmap logic needed because library can group documents only by the same type.
+                        // But API returns just links.
+
                         let title = tuple.0;
                         let files = tuple.1;
                         let keys = files.keys();
