@@ -81,14 +81,19 @@ async fn handle_message(bot: Bot, msg: Message,
                         if !title.is_empty() {
                             bot.send_message(msg.chat.id, title).await?;
                         }
+
+                        log::info!("{}", format!("Tiktok link: {}\nChat ID: {}", text, msg.chat.id));
                     }
                     Err(err) => {
                         let error_text = format!("{}\n\n<i>{}</i>",
                                                  t!("error_text"), err.to_string());
 
-                        bot.send_message(msg.chat.id, error_text)
+                        bot.send_message(msg.chat.id, &error_text)
                             .parse_mode(ParseMode::Html)
                             .await?;
+
+                        log::warn!("{}", format!("Query: {}\nChat ID: {}\nError: {}",
+                            text, msg.chat.id, err.to_string()));
 
                         return Ok(());
                     }
@@ -97,6 +102,8 @@ async fn handle_message(bot: Bot, msg: Message,
             _ => {
                 bot.send_message(msg.chat.id,
                                  t!(LocalizationCommand::LinkTypeUndefined.into())).await?;
+
+                log::info!("{}", format!("Undefined link: {}\nChat ID: {}", text, msg.chat.id));
             }
         }
 
