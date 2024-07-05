@@ -70,9 +70,12 @@ async fn handle_message(bot: Bot, msg: Message,
                     Ok(tuple) => {
                         let title = tuple.0;
                         let files = tuple.1;
-
-                        for file in files {
-                            bot.send_document(msg.chat.id, file).await?;
+                        let keys = files.keys();
+                        for key in keys {
+                            let vector = files.get(key);
+                            if let Some(vector) = vector {
+                                bot.send_media_group(msg.chat.id, vector.clone()).await?;
+                            }
                         }
 
                         if !title.is_empty() {
