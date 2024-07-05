@@ -1,0 +1,85 @@
+name: release_bot
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build_windows:
+    name: Bot Build Windows x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --all-features --manifest-path media_fetch_bot/Cargo.toml
+
+      - name: Create release ZIP archive
+        run: tar.exe acvf Win-x64.zip -C .\media_fetch_bot\target\release media_fetch_bot.exe
+
+      - name: Create release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ github.ref_name }}
+          title: ${{ github.ref_name }}
+          prerelease: false
+          files: Win-x64.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Win-x64.zip
+          path: Win-x64.zip
+
+  build_linux:
+    name: Bot Build Ubuntu x64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --release --all-features --manifest-path media_fetch_bot/Cargo.toml
+
+      - name: Create release ZIP archive
+        run: tar -czvf Ubuntu-x64.tar.gz -C /home/runner/work/MediaFetchBot/MediaFetchBot/media_fetch_bot/target/release/ media_fetch_bot
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ubuntu-x64.tar.gz
+          path: Ubuntu-x64.tar.gz
+
+  create_release:
+    runs-on: ubuntu-latest
+    needs: [ build_windows, build_linux ]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Win-x64.zip
+          path: .
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: Ubuntu-x64.tar.gz
+          path: .
+
+      - name: Create release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: ${{ github.ref_name }}
+          title: ${{ github.ref_name }}
+          prerelease: false
+          files: |
+            Win-x64.zip
+            Ubuntu-x64.tar.gz
