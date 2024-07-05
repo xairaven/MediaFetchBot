@@ -6,7 +6,7 @@ This bot allows you to effortlessly download TikTok videos by **simply sending a
 
 ![](https://img.shields.io/github/actions/workflow/status/xairaven/MediaFetchBot/release_bot.yml?style=plastic)
 ![](https://img.shields.io/github/v/release/xairaven/MediaFetchBot?style=plastic)
-![](https://img.shields.io/github/commit-activity/m/MediaFetchBot/AlarmClock?style=plastic)
+![](https://img.shields.io/github/commit-activity/m/xairaven/MediaFetchBot?style=plastic)
 ![](https://img.shields.io/github/license/xairaven/MediaFetchBot?style=plastic)
 ![](https://img.shields.io/github/issues/xairaven/MediaFetchBot?style=plastic)
 
