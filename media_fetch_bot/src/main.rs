@@ -6,6 +6,7 @@ use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
 use teloxide::types::{ParseMode};
 use std::{process};
+use pretty_env_logger::env_logger::Target;
 
 pub mod bot_commands;
 pub mod bot_config;
@@ -19,17 +20,17 @@ rust_i18n::i18n!("locales");
 
 #[tokio::main]
 async fn main() {
-    pretty_env_logger::init();
-
-    log::info!("Started executable...");
-
     rust_i18n::set_locale("en");
-    log::info!("Set 'en' locale...");
 
     let bot_config = BotConfig::build().unwrap_or_else(|err| {
         log::error!("Error: {err}");
         process::exit(1);
     });
+
+    pretty_env_logger::formatted_builder()
+        .filter_level(bot_config.log_level)
+        .target(Target::Stdout)
+        .init();
 
     log::info!("Starting bot...");
 

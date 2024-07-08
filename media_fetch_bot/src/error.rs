@@ -14,8 +14,8 @@ pub enum BotError {
     #[error("EnvBotName: Something wrong with .env BOT_NAME. May be, there's no field with this name.")]
     EnvBotName,
 
-    #[error("EnvSaveDir: Something wrong with .env SAVE_DIR. May be, there's no field with this name.")]
-    EnvSaveDir,
+    #[error("EnvEnvBotLogLevel: Something wrong with .env LOG_LEVEL. May be, there's no field with this name.")]
+    EnvBotLogLevel,
 
     #[error("FailedGetUserMessage: Failed to get user message.")]
     FailedGetUserMessage,

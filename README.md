@@ -26,8 +26,11 @@ Firstly, create a file named `.env` with this structure:
 ```.env
 BOT_TOKEN=...
 BOT_NAME=your_telegram_bot_username
+LOG_LEVEL=...
 TIKTOK_API_KEY=...
 ```
+
+If you want to change the log level (default is `ERROR`), set the LOG_LEVEL variable to the desired level (`error`, `warn`, `info`, `debug`, `trace`, `off`).
 
 Place it in the location specified in the instruction for the preferred method.
 
@@ -43,8 +46,6 @@ Download the archive from the [latest release](github.com/xairaven/MediaFetchBot
 
 In the archives, there is only one file — the executable. Place `.env` in the same folder.
 
-If you want to change the log level (default is `ERROR`), set the environmental variable `RUST_LOG` to the desired level (`error`, `warn`, `info`, `debug`, `trace`, `off`).
-
 <h3>Method 2. Docker</h3>
 
 Place `.env` in `<repo_folder>/media_fetch_bot/`.
@@ -52,10 +53,6 @@ Place `.env` in `<repo_folder>/media_fetch_bot/`.
 Change `bot_username` in Dockerfile:
 
 ```Dockerfile
-# Log level. Error, warn, info, debug, trace, off.
-# Can also be "main" or "your_app_name" (same values)
-ENV RUST_LOG=info
-
 # Your app name (write same name to both)
 ARG APP_NAME_ARG=...
 ENV APP_NAME_ENV=...same

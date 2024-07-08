@@ -24,10 +24,6 @@ RUN apt update && apt install -y \
 ########################################################
 # ENV VARIABLES
 
-# Log level. Error, warn, info, debug, trace, off.
-# Can also be "main" or "your_app_name" (same values)
-ENV RUST_LOG=info
-
 # Your app name (write same name to both)
 ARG APP_NAME_ARG=media_fetch_bot
 ENV APP_NAME_ENV=media_fetch_bot
