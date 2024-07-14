@@ -1,12 +1,14 @@
+use std::collections::HashMap;
+
+use reqwest::header;
+use reqwest::header::HeaderValue;
+use serde_json::Value;
+use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
+use url::{ParseError, Url};
+
 use crate::error::BotError;
 use crate::tiktok::media_format::MediaFormat;
 use crate::tiktok::raw_media::RawMedia;
-use reqwest::{header};
-use reqwest::header::{HeaderValue};
-use serde_json::Value;
-use std::collections::HashMap;
-use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
-use url::{ParseError, Url};
 
 pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
                           -> Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), BotError> {
@@ -16,10 +18,7 @@ pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
     };
 
     let response = get_response(tiktok_api_key, link).await;
-    let response = match response {
-        Ok(value) => value,
-        Err(_) => { return Err(BotError::FailedGetResponse) }
-    };
+    let response = response.map_err(|_| BotError::FailedGetResponse)?;
 
     let response_results = parse_response(response)?;
     let mut files: HashMap<MediaFormat, Vec<InputMedia>> = HashMap::new();
@@ -30,10 +29,7 @@ pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
         let href = raw_media.href;
 
         let url: Result<Url, ParseError> = href.parse();
-        let url = match url {
-            Ok(value) => value,
-            Err(_) => { return Err(BotError::FailedParseUrl); }
-        };
+        let url = url.map_err(|_| BotError::FailedParseUrl)?;
 
         let file = InputFile::url(url);
         let file = match &raw_media.format {
@@ -53,10 +49,8 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<
     let mut headers = header::HeaderMap::new();
     headers.insert("x-rapidapi-host", "tiktok-download-without-watermark.p.rapidapi.com".parse().unwrap());
 
-    let key_value: HeaderValue = match tiktok_api_key.parse() {
-        Ok(value) => value,
-        Err(_) => { return Err(BotError::WrongApiKey.into()); }
-    };
+    let key_value: HeaderValue = tiktok_api_key.parse()
+        .map_err(|_| BotError::WrongApiKey)?;
     headers.insert("x-rapidapi-key", key_value);
 
     let client = reqwest::Client::builder()
@@ -76,10 +70,8 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<
 
 fn parse_response(response: String) -> Result<(String, Vec<RawMedia>), BotError> {
     let parsed_response: serde_json::error::Result<Value> = serde_json::from_str(&response);
-    let parsed_response = match parsed_response {
-        Ok(value) => value,
-        Err(_) => { return Err(BotError::FailedParseResponse) }
-    };
+    let parsed_response = parsed_response
+        .map_err(|_| BotError::FailedParseResponse)?;
 
     let mut results: Vec<RawMedia> = vec![];
 

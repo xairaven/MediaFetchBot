@@ -18,22 +18,16 @@ impl BotConfig {
         }
 
         // Loading token
-        let token = match env::var("BOT_TOKEN") {
-            Ok(value) => value,
-            Err(_) => return Err(BotError::EnvBotToken)
-        };
+        let token = env::var("BOT_TOKEN")
+            .map_err(|_| BotError::EnvBotToken)?;
 
         // Loading bot name
-        let name = match env::var("BOT_NAME") {
-            Ok(value) => value,
-            Err(_) => return Err(BotError::EnvBotName)
-        };
+        let name = env::var("BOT_NAME")
+            .map_err(|_| BotError::EnvBotName)?;
 
         // Loading log level
-        let log_level = match env::var("LOG_LEVEL") {
-            Ok(value) => value,
-            Err(_) => return Err(BotError::EnvBotLogLevel)
-        };
+        let log_level = env::var("LOG_LEVEL")
+            .map_err(|_| BotError::EnvBotLogLevel)?;
         let log_level = match log_level.to_lowercase().trim() {
             "off" => LevelFilter::Off,
             "error" => LevelFilter::Error,
@@ -45,10 +39,7 @@ impl BotConfig {
         };
 
         // Loading tiktok_api_key
-        let tiktok_api_key = match env::var("TIKTOK_API_KEY") {
-            Ok(value) => Some(value),
-            Err(_) => None
-        };
+        let tiktok_api_key = env::var("TIKTOK_API_KEY").ok();
 
         // Returning Config var
         Ok(BotConfig {
