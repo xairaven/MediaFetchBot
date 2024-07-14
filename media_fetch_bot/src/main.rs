@@ -85,7 +85,7 @@ async fn handle_message(bot: Bot, msg: Message,
                             bot.send_message(msg.chat.id, title).await?;
                         }
 
-                        log::info!("{}", format!("Tiktok link: {}\nChat ID: {}", text, msg.chat.id));
+                        log::info!("{}", format!("ChatID: {} -> Tiktok: {}", msg.chat.id, text));
                     }
                     Err(err) => {
                         let error_text = format!("{}\n\n<i>{}</i>",
@@ -95,8 +95,8 @@ async fn handle_message(bot: Bot, msg: Message,
                             .parse_mode(ParseMode::Html)
                             .await?;
 
-                        log::warn!("{}", format!("Query: {}\nChat ID: {}\nError: {}",
-                            text, msg.chat.id, err.to_string()));
+                        log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
+                            msg.chat.id, text));
 
                         return Ok(());
                     }
@@ -105,8 +105,7 @@ async fn handle_message(bot: Bot, msg: Message,
             _ => {
                 bot.send_message(msg.chat.id,
                                  t!(LocalizationCommand::LinkTypeUndefined.into())).await?;
-
-                log::info!("{}", format!("Undefined link: {}\nChat ID: {}", text, msg.chat.id));
+                log::info!("{}", format!("ChatID: {} -> Undefined: {}", msg.chat.id, text));
             }
         }
 
