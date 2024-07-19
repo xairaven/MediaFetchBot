@@ -91,7 +91,7 @@ async fn handle_command(bot: Bot, msg: Message, cmd: BotCommand) -> ResponseResu
 async fn handle_tiktok_link(link: &str, api_key: Option<String>,
                             bot: &Bot, msg: &Message) -> ResponseResult<()>{
     let results
-        = tiktok::handler::process_link(api_key, link.to_string()).await;
+        = tiktok::handler::get_results(api_key, link.to_string()).await;
 
     match results {
         Ok(tuple) => {

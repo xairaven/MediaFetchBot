@@ -4,20 +4,21 @@ use reqwest::header;
 use reqwest::header::HeaderValue;
 use serde_json::Value;
 use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
-use url::{ParseError, Url};
+use url::{Url};
 
 use crate::tiktok::api_error::ApiError;
 use crate::tiktok::media_format::MediaFormat;
 use crate::tiktok::raw_media::RawMedia;
 
-pub async fn process_link(tiktok_api_key: Option<String>, link: String)
+pub async fn get_results(tiktok_api_key: Option<String>, link: String)
                           -> Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ApiError> {
     let tiktok_api_key: String = tiktok_api_key.ok_or(ApiError::ApiKeyTiktokMissing)?;
 
-    let response = get_response(&tiktok_api_key, link).await;
-    let response = response.map_err(|_| ApiError::FailedGetResponse)?;
+    let response = get_response(&tiktok_api_key, link).await
+        .map_err(|_| ApiError::FailedGetResponse)?;
 
-    let response_results = parse_response(response)?;
+    let parsed_json = response_to_json(response)?;
+    let response_results = pack_result(parsed_json)?;
     let mut files: HashMap<MediaFormat, Vec<InputMedia>> = HashMap::new();
 
     // Parsing vector of results
@@ -25,8 +26,8 @@ pub async fn process_link(tiktok_api_key: Option<String>, link: String)
     for raw_media in response_documents {
         let href = raw_media.href;
 
-        let url: Result<Url, ParseError> = href.parse();
-        let url = url.map_err(|_| ApiError::FailedParseUrl)?;
+        let url: Url = href.parse()
+            .map_err(|_| ApiError::FailedParseUrl)?;
 
         let file = InputFile::url(url);
         let file = match &raw_media.format {
@@ -68,14 +69,17 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<
     Ok(response)
 }
 
-fn parse_response(response: String) -> Result<(String, Vec<RawMedia>), ApiError> {
-    let parsed_response: serde_json::error::Result<Value> = serde_json::from_str(&response);
-    let parsed_response = parsed_response
+fn response_to_json(response: String) -> Result<Value, ApiError> {
+    let parsed_response: Value = serde_json::from_str(&response)
         .map_err(|_| ApiError::FailedParseResponse)?;
 
+    Ok(parsed_response)
+}
+
+fn pack_result(json: Value) -> Result<(String, Vec<RawMedia>), ApiError> {
     let mut results: Vec<RawMedia> = vec![];
 
-    let data = &parsed_response["data"];
+    let data = &json["data"];
 
     let title: String = match &data["title"] {
         Value::String(value) => value.to_string(),
