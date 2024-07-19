@@ -1,6 +1,5 @@
 use crate::bot_commands::BotCommand;
 use crate::bot_config::BotConfig;
-use crate::command::Command;
 use crate::errors::user_input::UserInputError;
 use crate::link_type::LinkType;
 use crate::localized_messages::LocalizedMessage;
@@ -12,7 +11,6 @@ use pretty_env_logger::env_logger::Target;
 
 mod bot_commands;
 mod bot_config;
-mod command;
 mod errors;
 mod link_type;
 mod localized_messages;
@@ -119,7 +117,7 @@ async fn handle_message(bot: Bot, msg: Message,
 
 async fn handle_command(bot: Bot, msg: Message, cmd: BotCommand) -> ResponseResult<()> {
     match cmd {
-        BotCommand::Help => bot.send_message(msg.chat.id, t!(&Command::Help.to_string()))
+        BotCommand::Help => bot.send_message(msg.chat.id, t!(&BotCommand::Help.to_string()))
             .parse_mode(ParseMode::Html)
             .await?,
     };
