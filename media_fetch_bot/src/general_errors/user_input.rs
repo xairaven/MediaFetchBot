@@ -2,9 +2,9 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum UserInputError {
-    #[error("Empty message.")]
+    #[error("EmptyMessage")]
     EmptyMessage,
 
-    #[error("Link type undefined.")]
+    #[error("LinkTypeUndefined")]
     LinkTypeUndefined
 }

@@ -50,8 +50,7 @@ async fn handle_message(bot: Bot, msg: Message,
                         tiktok_api_key: Option<String>) -> ResponseResult<()> {
     let text = match msg.text() {
         None => {
-            bot.send_message(msg.chat.id,
-                             UserInputError::EmptyMessage.to_string()).await?;
+            bot.send_message(msg.chat.id, t!(&UserInputError::EmptyMessage.to_string())).await?;
             return Ok(());
         }
         Some(value) => value
@@ -68,7 +67,7 @@ async fn handle_message(bot: Bot, msg: Message,
             }
             _ => {
                 bot.send_message(msg.chat.id,
-                                 UserInputError::LinkTypeUndefined.to_string()).await?;
+                                 t!(&UserInputError::LinkTypeUndefined.to_string())).await?;
                 log::info!("{}", format!("ChatID: {} -> Undefined: {}", msg.chat.id, text));
             }
         }
@@ -116,7 +115,7 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
         Err(err) => {
             let error_text = match err {
                 ErrorType::Backend(ref specific_err) =>  {
-                    log::error!("{}", format!("{}: ChatID: {} -> ErrQuery: {}",
+                    log::error!("{}", format!("{}. ChatID: {} -> ErrQuery: {}",
                             specific_err, msg.chat.id, link));
 
                     format!("{}", t!(&err.to_string()))
@@ -125,7 +124,7 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
                     log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
                             msg.chat.id, link));
 
-                    format!("{}", err)
+                    format!("{}", t!(&err.to_string()))
                 }
             };
 

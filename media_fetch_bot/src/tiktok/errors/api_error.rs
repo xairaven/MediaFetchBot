@@ -2,21 +2,21 @@ use thiserror::Error;
 
 #[derive(Debug, Error)]
 pub enum ApiError {
-    #[error("Tiktok API Key missing. Tiktok module is not working.")]
+    #[error("ApiKeyTiktokMissing")]
     ApiKeyTiktokMissing,
 
-    #[error("FailedGetResponse: Failed to get a response from API.")]
+    #[error("FailedGetResponse")]
     FailedGetResponse,
 
-    #[error("FailedParseResponse: Failed to parse response.")]
+    #[error("FailedParseResponse")]
     FailedParseResponse,
 
-    #[error("FailedParseUrl: Failed to parse final url.")]
+    #[error("FailedParseUrl")]
     FailedParseUrl,
 
-    #[error("WrongApiHost: x-rapidapi-host header is wrong.")]
+    #[error("WrongApiHost")]
     WrongApiHost,
 
-    #[error("WrongApiKey: x-rapidapi-key header is wrong.")]
+    #[error("WrongApiKey")]
     WrongApiKey,
 }

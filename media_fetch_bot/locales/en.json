@@ -2,5 +2,25 @@
   "_version": 1,
   "Help": "<b>Welcome to the Media Downloader Bot!</b>\n\n<b>Commands:</b>\n- /help: Display this help message.\n\n<b>How to use:</b>\nTo download media from TikTok simply send a TikTok video or photo slides link directly to the bot.\nThe bot will process the link and send the media file back to you.\n\n<b>Additional Notes:</b>\nEnsure the TikTok link is directly accessible (not private or restricted).\n\n<b>Supported formats:</b> Video and photo slides.",
 
-  "TikTokBackendErrorMessage": "<b>Error message:</b>\nSomething is wrong either with the bot or with TikTok API.\nPlease report this incident to the bot administrator."
+
+  "ApiKeyTiktokMissing": "Tiktok API Key missing. Tiktok module is not working.",
+  "FailedGetResponse": "Failed to get a response from API.",
+  "FailedParseResponse": "Failed to parse response.",
+  "FailedParseUrl": "Failed to parse final url.",
+  "WrongApiHost": "x-rapidapi-host header is wrong.",
+  "WrongApiKey": "x-rapidapi-key header is wrong.",
+
+  "ConfigNotLoaded": "Something wrong with .env file. May be, it not exists.",
+  "LogLevelNotLoaded": "Something wrong with .env LOG_LEVEL. May be, there's no field with this name.",
+  "LogLevelUndefined": "Undefined LOG_LEVEL. Possible levels: error, warn, info, debug, trace, off",
+  "NameNotLoaded": "Something wrong with .env BOT_NAME. May be, there's no field with this name.",
+  "TokenNotLoaded": "Something wrong with .env BOT_TOKEN. May be, there's no field with this name.",
+
+  "EmptyMessage": "Empty message.",
+  "LinkTypeUndefined": "Link type undefined.",
+
+  "NoResult": "Unfortunately, there's no content at this link.",
+
+  "TikTokBackendError": "<b>Error message:</b>\nSomething is wrong either with the bot or with TikTok API.\nPlease report this incident to the bot administrator.",
+  "TikTokUserError": "User Error. Something wrong with user input"
 }
