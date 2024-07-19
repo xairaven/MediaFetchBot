@@ -13,7 +13,9 @@ mod bot_commands;
 mod bot_config;
 mod general_errors;
 mod link_type;
+
 mod tiktok;
+mod instagram;
 
 
 // Defining folder with locales. Path: media_fetch_bot/locales
@@ -39,7 +41,8 @@ async fn main() {
 
     Dispatcher::builder(bot, Update::filter_message().endpoint(handle_message))
         .dependencies(dptree::deps![bot_config.name,
-            bot_config.tiktok_api_key])
+            bot_config.tiktok_api_key,
+            bot_config.instagram_api_key])
         .build()
         .dispatch()
         .await;
@@ -47,7 +50,8 @@ async fn main() {
 
 async fn handle_message(bot: Bot, msg: Message,
                         bot_name: String,
-                        tiktok_api_key: Option<String>) -> ResponseResult<()> {
+                        tiktok_api_key: Option<String>,
+                        instagram_api_key: Option<String>) -> ResponseResult<()> {
     let text = match msg.text() {
         None => {
             bot.send_message(msg.chat.id, t!(&UserInputError::EmptyMessage.to_string())).await?;
@@ -64,6 +68,10 @@ async fn handle_message(bot: Bot, msg: Message,
             tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
                 handle_tiktok_link(tiktok_link, tiktok_api_key,
                                    &bot, &msg).await?
+            }
+            instagram_link if instagram_link.contains(&LinkType::Instagram.to_string()) => {
+                handle_instagram_link(instagram_link, instagram_api_key,
+                                      &bot, &msg).await?
             }
             _ => {
                 bot.send_message(msg.chat.id,
@@ -87,7 +95,7 @@ async fn handle_command(bot: Bot, msg: Message, cmd: BotCommand) -> ResponseResu
 }
 
 async fn handle_tiktok_link(link: &str, api_key: Option<String>,
-                            bot: &Bot, msg: &Message) -> ResponseResult<()>{
+                            bot: &Bot, msg: &Message) -> ResponseResult<()> {
     let results
         = tiktok::handler::get_results(api_key, link.to_string()).await;
 
@@ -114,12 +122,12 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
         }
         Err(err) => {
             let error_text = match err {
-                ErrorType::Backend(ref specific_err) =>  {
+                ErrorType::Backend(ref specific_err) => {
                     log::error!("{}", format!("{}. ChatID: {} -> ErrQuery: {}",
                             specific_err, msg.chat.id, link));
 
                     format!("{}", t!(&err.to_string()))
-                },
+                }
                 ErrorType::User(err) => {
                     log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
                             msg.chat.id, link));
@@ -133,6 +141,23 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
                 .await?;
         }
     };
+
+    Ok(())
+}
+
+async fn handle_instagram_link(link: &str, api_key: Option<String>,
+                               bot: &Bot, msg: &Message) -> ResponseResult<()> {
+    let results = instagram::handler::get_results(api_key, link.to_string()).await;
+    match results {
+        Ok(result) => {
+            bot.send_message(msg.chat.id, result).await?;
+
+            log::info!("{}", format!("ChatID: {} -> Instagram: {}", msg.chat.id, link));
+        }
+        Err(err) => {
+            bot.send_message(msg.chat.id, err.to_string()).await?;
+        }
+    }
 
     Ok(())
 }

@@ -8,6 +8,7 @@ pub struct BotConfig {
     pub name: String,
     pub log_level: LevelFilter,
     pub tiktok_api_key: Option<String>,
+    pub instagram_api_key: Option<String>
 }
 
 impl BotConfig {
@@ -38,9 +39,16 @@ impl BotConfig {
             _ => return Err(EnvError::LogLevelUndefined)
         };
 
-        // Loading tiktok_api_key
+        // Loading TikTok API Key
         let tiktok_api_key = env::var("TIKTOK_API_KEY");
         let tiktok_api_key = match tiktok_api_key {
+            Ok(value) if !value.trim().is_empty() => Some(value),
+            _ => None
+        };
+
+        // Loading Instagram API Key
+        let instagram_api_key = env::var("INSTAGRAM_API_KEY");
+        let instagram_api_key = match instagram_api_key {
             Ok(value) if !value.trim().is_empty() => Some(value),
             _ => None
         };
@@ -51,6 +59,7 @@ impl BotConfig {
             name,
             log_level,
             tiktok_api_key,
+            instagram_api_key,
         })
     }
 }
