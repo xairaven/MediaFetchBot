@@ -1,7 +1,8 @@
 use crate::bot_commands::BotCommand;
 use crate::bot_config::BotConfig;
+use crate::command::Command;
+use crate::errors::user_input_errors::UserInputError;
 use crate::link_type::LinkType;
-use crate::localization::LocalizationCommand;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
 use teloxide::types::{ParseMode};
@@ -10,9 +11,10 @@ use pretty_env_logger::env_logger::Target;
 
 pub mod bot_commands;
 pub mod bot_config;
+pub mod errors;
 pub mod error;
 mod link_type;
-pub mod localization;
+pub mod command;
 pub mod tiktok;
 
 // Defining folder with locales. Path: media_fetch_bot/locales
@@ -52,7 +54,7 @@ async fn handle_message(bot: Bot, msg: Message,
     let text = match msg.text() {
         None => {
             bot.send_message(msg.chat.id,
-                             t!(LocalizationCommand::EmptyMessage.into())).await?;
+                             UserInputError::EmptyMessage.to_string()).await?;
             return Ok(());
         }
         Some(value) => value
@@ -104,7 +106,7 @@ async fn handle_message(bot: Bot, msg: Message,
             }
             _ => {
                 bot.send_message(msg.chat.id,
-                                 t!(LocalizationCommand::LinkTypeUndefined.into())).await?;
+                                 UserInputError::LinkTypeUndefined.to_string()).await?;
                 log::info!("{}", format!("ChatID: {} -> Undefined: {}", msg.chat.id, text));
             }
         }
@@ -115,8 +117,7 @@ async fn handle_message(bot: Bot, msg: Message,
 
 async fn handle_command(bot: Bot, msg: Message, cmd: BotCommand) -> ResponseResult<()> {
     match cmd {
-        BotCommand::Help => bot.send_message(msg.chat.id,
-                                             t!(LocalizationCommand::Help.into()))
+        BotCommand::Help => bot.send_message(msg.chat.id, Command::Help.to_string())
             .parse_mode(ParseMode::Html)
             .await?,
     };
