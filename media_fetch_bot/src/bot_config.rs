@@ -1,7 +1,7 @@
 use crate::errors::env::EnvError;
 use dotenvy::dotenv;
-use std::env;
 use log::LevelFilter;
+use std::env;
 
 pub struct BotConfig {
     pub token: String,
@@ -39,7 +39,11 @@ impl BotConfig {
         };
 
         // Loading tiktok_api_key
-        let tiktok_api_key = env::var("TIKTOK_API_KEY").ok();
+        let tiktok_api_key = env::var("TIKTOK_API_KEY");
+        let tiktok_api_key = match tiktok_api_key {
+            Ok(value) if !value.trim().is_empty() => Some(value),
+            _ => None
+        };
 
         // Returning Config var
         Ok(BotConfig {

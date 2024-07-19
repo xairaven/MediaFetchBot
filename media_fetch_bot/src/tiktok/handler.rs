@@ -10,14 +10,11 @@ use crate::tiktok::api_error::ApiError;
 use crate::tiktok::media_format::MediaFormat;
 use crate::tiktok::raw_media::RawMedia;
 
-pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
+pub async fn process_link(tiktok_api_key: Option<String>, link: String)
                           -> Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ApiError> {
-    let tiktok_api_key: &str = match tiktok_api_key {
-        None => { return Err(ApiError::ApiKeyTiktokMissing) }
-        Some(value) => value
-    };
+    let tiktok_api_key: String = tiktok_api_key.ok_or(ApiError::ApiKeyTiktokMissing)?;
 
-    let response = get_response(tiktok_api_key, link).await;
+    let response = get_response(&tiktok_api_key, link).await;
     let response = response.map_err(|_| ApiError::FailedGetResponse)?;
 
     let response_results = parse_response(response)?;

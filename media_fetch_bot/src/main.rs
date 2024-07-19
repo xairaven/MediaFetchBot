@@ -64,7 +64,7 @@ async fn handle_message(bot: Bot, msg: Message,
     } else {
         match text {
             tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
-                handle_tiktok_link(tiktok_link, &tiktok_api_key,
+                handle_tiktok_link(tiktok_link, tiktok_api_key,
                                    &bot, &msg).await?
             }
             _ => {
@@ -88,7 +88,7 @@ async fn handle_command(bot: Bot, msg: Message, cmd: BotCommand) -> ResponseResu
     Ok(())
 }
 
-async fn handle_tiktok_link(link: &str, api_key: &Option<String>,
+async fn handle_tiktok_link(link: &str, api_key: Option<String>,
                             bot: &Bot, msg: &Message) -> ResponseResult<()>{
     let results
         = tiktok::handler::process_link(api_key, link.to_string()).await;
