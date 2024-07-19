@@ -4,7 +4,7 @@ use crate::tiktok::errors::user_error::UserError;
 
 #[derive(Error, Debug)]
 pub enum ErrorType {
-    #[error("Backend Error. Something happened with server")]
+    #[error("TikTokBackendErrorMessage")]
     Backend(#[from] ApiError),
 
     #[error("User Error. Something wrong with user input")]

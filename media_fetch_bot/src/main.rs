@@ -2,7 +2,6 @@ use crate::bot_commands::BotCommand;
 use crate::bot_config::BotConfig;
 use crate::general_errors::user_input::UserInputError;
 use crate::link_type::LinkType;
-use crate::localized_messages::LocalizedMessage;
 use crate::tiktok::errors::error_type::ErrorType;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
@@ -14,7 +13,6 @@ mod bot_commands;
 mod bot_config;
 mod general_errors;
 mod link_type;
-mod localized_messages;
 mod tiktok;
 
 
@@ -117,11 +115,11 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
         }
         Err(err) => {
             let error_text = match err {
-                ErrorType::Backend(err) =>  {
+                ErrorType::Backend(ref specific_err) =>  {
                     log::error!("{}", format!("{}: ChatID: {} -> ErrQuery: {}",
-                            err, msg.chat.id, link));
+                            specific_err, msg.chat.id, link));
 
-                    format!("{}", t!(&LocalizedMessage::TikTokBackendErrorMessage.to_string()))
+                    format!("{}", t!(&err.to_string()))
                 },
                 ErrorType::User(err) => {
                     log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
