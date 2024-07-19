@@ -1,7 +1,7 @@
 use crate::bot_commands::BotCommand;
 use crate::bot_config::BotConfig;
 use crate::command::Command;
-use crate::errors::user_input_errors::UserInputError;
+use crate::errors::user_input::UserInputError;
 use crate::link_type::LinkType;
 use crate::localized_messages::LocalizedMessage;
 use rust_i18n::t;

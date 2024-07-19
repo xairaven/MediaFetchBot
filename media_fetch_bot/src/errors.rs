@@ -1,1 +1,1 @@
-pub mod user_input_errors;
+pub mod user_input;
