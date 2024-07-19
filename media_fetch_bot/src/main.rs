@@ -3,19 +3,22 @@ use crate::bot_config::BotConfig;
 use crate::command::Command;
 use crate::errors::user_input_errors::UserInputError;
 use crate::link_type::LinkType;
+use crate::localized_messages::LocalizedMessage;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
 use teloxide::types::{ParseMode};
 use std::{process};
 use pretty_env_logger::env_logger::Target;
 
-pub mod bot_commands;
-pub mod bot_config;
-pub mod errors;
-pub mod error;
+mod bot_commands;
+mod bot_config;
+mod command;
+mod errors;
+mod error;
 mod link_type;
-pub mod command;
-pub mod tiktok;
+mod localized_messages;
+mod tiktok;
+
 
 // Defining folder with locales. Path: media_fetch_bot/locales
 rust_i18n::i18n!("locales");
@@ -91,7 +94,7 @@ async fn handle_message(bot: Bot, msg: Message,
                     }
                     Err(err) => {
                         let error_text = format!("{}\n\n<i>{}</i>",
-                                                 t!("error_text"), err);
+                                                 t!(&LocalizedMessage::ErrorMessage.to_string()), err);
 
                         bot.send_message(msg.chat.id, &error_text)
                             .parse_mode(ParseMode::Html)
