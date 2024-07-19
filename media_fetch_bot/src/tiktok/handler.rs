@@ -5,11 +5,12 @@ use std::collections::HashMap;
 use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
 use url::{Url};
 
-use crate::tiktok::errors::api_error::ApiError;
-use crate::tiktok::errors::error_type::ErrorType;
-use crate::tiktok::errors::user_error::UserError;
+use crate::errors::api::ApiError;
+use crate::errors::error_type::ErrorType;
+use crate::errors::user_input::UserInputError;
 use crate::tiktok::media_format::MediaFormat;
 use crate::tiktok::raw_media::RawMedia;
+use crate::utils::response_processing;
 
 type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
 
@@ -19,7 +20,7 @@ pub async fn get_results(tiktok_api_key: Option<String>, link: String)
 
     let response = get_response(&tiktok_api_key, link).await
         .map_err(|_| ApiError::FailedGetResponse)?;
-    let json = response_to_json(response)?;
+    let json = response_processing::to_json(response)?;
 
     let (post_title, raw_media_documents) = parse_json(json)?;
 
@@ -54,14 +55,7 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<
     Ok(response)
 }
 
-fn response_to_json(response: String) -> Result<Value, ApiError> {
-    let parsed_response: Value = serde_json::from_str(&response)
-        .map_err(|_| ApiError::FailedParseResponse)?;
-
-    Ok(parsed_response)
-}
-
-fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserError> {
+fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
     let mut results: Vec<RawMedia> = vec![];
 
     let data = &json["data"];
@@ -73,7 +67,7 @@ fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserError> {
 
     let play = match &data["play"] {
         Value::String(value) => value.to_string(),
-        _ => { return Err(UserError::NoResult); }
+        _ => { return Err(UserInputError::NoResult); }
     };
 
     // Supposing that if there "images" field -- then, it's photo-slide format.

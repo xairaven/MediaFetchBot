@@ -1,8 +1,8 @@
 use reqwest::{Client};
 use reqwest::header::{HeaderMap, HeaderValue};
+use crate::errors::api::ApiError;
+use crate::errors::error_type::ErrorType;
 use crate::instagram::content_type::ContentType;
-use crate::instagram::errors::api_error::ApiError;
-use crate::instagram::errors::error_type::ErrorType;
 
 pub async fn get_results(api_key: Option<String>, link: String) -> Result<(String), ErrorType> {
     let api_key: String = api_key.ok_or(ApiError::ApiKeyInstagramMissing)?;

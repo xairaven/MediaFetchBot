@@ -1,8 +1,8 @@
 use crate::bot_commands::BotCommand;
 use crate::bot_config::BotConfig;
-use crate::general_errors::user_input::UserInputError;
+use crate::errors::error_type::ErrorType;
+use crate::errors::user_input::UserInputError;
 use crate::link_type::LinkType;
-use crate::tiktok::errors::error_type::ErrorType;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
 use teloxide::types::{ParseMode};
@@ -11,11 +11,12 @@ use pretty_env_logger::env_logger::Target;
 
 mod bot_commands;
 mod bot_config;
-mod general_errors;
+mod errors;
 mod link_type;
 
 mod tiktok;
 mod instagram;
+mod utils;
 
 
 // Defining folder with locales. Path: media_fetch_bot/locales

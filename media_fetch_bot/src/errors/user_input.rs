@@ -6,5 +6,8 @@ pub enum UserInputError {
     EmptyMessage,
 
     #[error("LinkTypeUndefined")]
-    LinkTypeUndefined
+    LinkTypeUndefined,
+
+    #[error("NoResult")]
+    NoResult,
 }
