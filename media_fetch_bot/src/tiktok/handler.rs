@@ -16,19 +16,15 @@ type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
 
 pub async fn get_results(tiktok_api_key: Option<String>, link: String)
                          -> Result<(String, InputMediaMap), ErrorType> {
-    let tiktok_api_key: String = tiktok_api_key.ok_or(
-        ErrorType::Backend(ApiError::ApiKeyTiktokMissing))?;
+    let tiktok_api_key: String = tiktok_api_key.ok_or(ApiError::ApiKeyTiktokMissing)?;
 
     let response = get_response(&tiktok_api_key, link).await
-        .map_err(|_| ErrorType::Backend(ApiError::FailedGetResponse))?;
-    let json = response_to_json(response)
-        .map_err(|err| ErrorType::Backend(err))?;
+        .map_err(|_| ApiError::FailedGetResponse)?;
+    let json = response_to_json(response)?;
 
-    let (post_title, raw_media_documents) = parse_json(json)
-        .map_err(|err| ErrorType::User(err))?;
+    let (post_title, raw_media_documents) = parse_json(json)?;
 
-    let input_media_map = convert_raw_to_input_media(raw_media_documents)
-        .map_err(|err| ErrorType::Backend(err))?;
+    let input_media_map = convert_raw_to_input_media(raw_media_documents)?;
 
     Ok((post_title, input_media_map))
 }
