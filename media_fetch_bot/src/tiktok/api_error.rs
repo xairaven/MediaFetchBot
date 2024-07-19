@@ -14,9 +14,6 @@ pub enum ApiError {
     #[error("FailedParseUrl: Failed to parse final url.")]
     FailedParseUrl,
 
-    #[error("NoResult: Unfortunately, there's no result by this query.")]
-    NoResult,
-
     #[error("WrongApiHost: x-rapidapi-host header is wrong.")]
     WrongApiHost,
 

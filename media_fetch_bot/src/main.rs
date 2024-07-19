@@ -8,6 +8,7 @@ use teloxide::{prelude::*, utils::command::BotCommands};
 use teloxide::types::{ParseMode};
 use std::{process};
 use pretty_env_logger::env_logger::Target;
+use crate::tiktok::error_type::ErrorType;
 
 mod bot_commands;
 mod bot_config;
@@ -115,15 +116,24 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
             log::info!("{}", format!("ChatID: {} -> Tiktok: {}", msg.chat.id, link));
         }
         Err(err) => {
-            let error_text = format!("{}\n\n<i>{}</i>",
-                                     t!(&LocalizedMessage::TikTokErrorMessage.to_string()), err);
+            let error_text = match err {
+                ErrorType::Backend(err) =>  {
+                    log::error!("{}", format!("{}: ChatID: {} -> ErrQuery: {}",
+                            err, msg.chat.id, link));
 
-            bot.send_message(msg.chat.id, &error_text)
+                    format!("{}", t!(&LocalizedMessage::TikTokBackendErrorMessage.to_string()))
+                },
+                ErrorType::User(err) => {
+                    log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
+                            msg.chat.id, link));
+
+                    format!("{}", err)
+                }
+            };
+
+            bot.send_message(msg.chat.id, error_text)
                 .parse_mode(ParseMode::Html)
                 .await?;
-
-            log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
-                            msg.chat.id, link));
         }
     };
 

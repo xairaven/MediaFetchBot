@@ -1,46 +1,36 @@
-use std::collections::HashMap;
-
 use reqwest::header;
 use reqwest::header::HeaderValue;
 use serde_json::Value;
+use std::collections::HashMap;
 use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
 use url::{Url};
 
 use crate::tiktok::api_error::ApiError;
+use crate::tiktok::error_type::ErrorType;
+
 use crate::tiktok::media_format::MediaFormat;
 use crate::tiktok::raw_media::RawMedia;
+use crate::tiktok::user_error::UserError;
+
+type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
 
 pub async fn get_results(tiktok_api_key: Option<String>, link: String)
-                          -> Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ApiError> {
-    let tiktok_api_key: String = tiktok_api_key.ok_or(ApiError::ApiKeyTiktokMissing)?;
+                         -> Result<(String, InputMediaMap), ErrorType> {
+    let tiktok_api_key: String = tiktok_api_key.ok_or(
+        ErrorType::Backend(ApiError::ApiKeyTiktokMissing))?;
 
     let response = get_response(&tiktok_api_key, link).await
-        .map_err(|_| ApiError::FailedGetResponse)?;
+        .map_err(|_| ErrorType::Backend(ApiError::FailedGetResponse))?;
+    let json = response_to_json(response)
+        .map_err(|err| ErrorType::Backend(err))?;
 
-    let parsed_json = response_to_json(response)?;
-    let response_results = pack_result(parsed_json)?;
-    let mut files: HashMap<MediaFormat, Vec<InputMedia>> = HashMap::new();
+    let (post_title, raw_media_documents) = parse_json(json)
+        .map_err(|err| ErrorType::User(err))?;
 
-    // Parsing vector of results
-    let response_documents = response_results.1;
-    for raw_media in response_documents {
-        let href = raw_media.href;
+    let input_media_map = convert_raw_to_input_media(raw_media_documents)
+        .map_err(|err| ErrorType::Backend(err))?;
 
-        let url: Url = href.parse()
-            .map_err(|_| ApiError::FailedParseUrl)?;
-
-        let file = InputFile::url(url);
-        let file = match &raw_media.format {
-            MediaFormat::Image => { InputMedia::Photo(InputMediaPhoto::new(file)) }
-            MediaFormat::Music => { InputMedia::Audio(InputMediaAudio::new(file)) }
-            MediaFormat::Video => { InputMedia::Video(InputMediaVideo::new(file)) }
-        };
-
-        let vector = files.entry(raw_media.format).or_default();
-        vector.push(file);
-    }
-
-    Ok((response_results.0, files))
+    Ok((post_title, input_media_map))
 }
 
 async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<dyn std::error::Error>> {
@@ -76,7 +66,7 @@ fn response_to_json(response: String) -> Result<Value, ApiError> {
     Ok(parsed_response)
 }
 
-fn pack_result(json: Value) -> Result<(String, Vec<RawMedia>), ApiError> {
+fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserError> {
     let mut results: Vec<RawMedia> = vec![];
 
     let data = &json["data"];
@@ -88,7 +78,7 @@ fn pack_result(json: Value) -> Result<(String, Vec<RawMedia>), ApiError> {
 
     let play = match &data["play"] {
         Value::String(value) => value.to_string(),
-        _ => { return Err(ApiError::NoResult); }
+        _ => { return Err(UserError::NoResult); }
     };
 
     // Supposing that if there "images" field -- then, it's photo-slide format.
@@ -105,4 +95,28 @@ fn pack_result(json: Value) -> Result<(String, Vec<RawMedia>), ApiError> {
     } else { results.push(RawMedia::new(play, MediaFormat::Video)); }
 
     Ok((title, results))
+}
+
+fn convert_raw_to_input_media(raw_media_documents: Vec<RawMedia>) -> Result<InputMediaMap, ApiError> {
+
+    let mut files: InputMediaMap = HashMap::new();
+    // Parsing vector of results
+    for raw_media in raw_media_documents {
+        let href = raw_media.href;
+
+        let url: Url = href.parse()
+            .map_err(|_| ApiError::FailedParseUrl)?;
+
+        let file = InputFile::url(url);
+        let file = match &raw_media.format {
+            MediaFormat::Image => { InputMedia::Photo(InputMediaPhoto::new(file)) }
+            MediaFormat::Music => { InputMedia::Audio(InputMediaAudio::new(file)) }
+            MediaFormat::Video => { InputMedia::Video(InputMediaVideo::new(file)) }
+        };
+
+        let vector = files.entry(raw_media.format).or_default();
+        vector.push(file);
+    }
+
+    Ok(files)
 }
