@@ -116,7 +116,7 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
         }
         Err(err) => {
             let error_text = format!("{}\n\n<i>{}</i>",
-                                     t!(&LocalizedMessage::ErrorMessage.to_string()), err);
+                                     t!(&LocalizedMessage::TikTokErrorMessage.to_string()), err);
 
             bot.send_message(msg.chat.id, &error_text)
                 .parse_mode(ParseMode::Html)

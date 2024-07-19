@@ -2,5 +2,5 @@
   "_version": 1,
   "Help": "<b>Welcome to the Media Downloader Bot!</b>\n\n<b>Commands:</b>\n- /help: Display this help message.\n\n<b>How to use:</b>\nTo download media from TikTok simply send a TikTok video or photo slides link directly to the bot.\nThe bot will process the link and send the media file back to you.\n\n<b>Additional Notes:</b>\nEnsure the TikTok link is directly accessible (not private or restricted).\n\n<b>Supported formats:</b> Video and photo slides.",
 
-  "ErrorMessage": "<b>Error message:</b>\nSomething is wrong either with the link or with the server.\nPlease report this incident to the bot administrator."
+  "TikTokErrorMessage": "<b>Error message:</b>\nSomething is wrong either with the link or with TikTok API.\nPlease report this incident to the bot administrator."
 }
