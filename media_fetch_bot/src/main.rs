@@ -66,43 +66,8 @@ async fn handle_message(bot: Bot, msg: Message,
     } else {
         match text {
             tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
-                let results
-                    = tiktok::handler::process_link(&tiktok_api_key, text.to_string()).await;
-                match results {
-                    Ok(tuple) => {
-                        // This hashmap logic needed because library can group documents only by the same type.
-                        // But API returns just links.
-
-                        let title = tuple.0;
-                        let files = tuple.1;
-                        let keys = files.keys();
-                        for key in keys {
-                            let vector = files.get(key);
-                            if let Some(vector) = vector {
-                                bot.send_media_group(msg.chat.id, vector.clone()).await?;
-                            }
-                        }
-
-                        if !title.is_empty() {
-                            bot.send_message(msg.chat.id, title).await?;
-                        }
-
-                        log::info!("{}", format!("ChatID: {} -> Tiktok: {}", msg.chat.id, text));
-                    }
-                    Err(err) => {
-                        let error_text = format!("{}\n\n<i>{}</i>",
-                                                 t!(&LocalizedMessage::ErrorMessage.to_string()), err);
-
-                        bot.send_message(msg.chat.id, &error_text)
-                            .parse_mode(ParseMode::Html)
-                            .await?;
-
-                        log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
-                            msg.chat.id, text));
-
-                        return Ok(());
-                    }
-                };
+                handle_tiktok_link(tiktok_link, &tiktok_api_key,
+                                   &bot, &msg).await?
             }
             _ => {
                 bot.send_message(msg.chat.id,
@@ -120,6 +85,48 @@ async fn handle_command(bot: Bot, msg: Message, cmd: BotCommand) -> ResponseResu
         BotCommand::Help => bot.send_message(msg.chat.id, t!(&BotCommand::Help.to_string()))
             .parse_mode(ParseMode::Html)
             .await?,
+    };
+
+    Ok(())
+}
+
+async fn handle_tiktok_link(link: &str, api_key: &Option<String>,
+                            bot: &Bot, msg: &Message) -> ResponseResult<()>{
+    let results
+        = tiktok::handler::process_link(api_key, link.to_string()).await;
+
+    match results {
+        Ok(tuple) => {
+            // This hashmap logic needed because library can group documents only by the same type.
+            // But API returns just links.
+
+            let title = tuple.0;
+            let files = tuple.1;
+            let keys = files.keys();
+            for key in keys {
+                let vector = files.get(key);
+                if let Some(vector) = vector {
+                    bot.send_media_group(msg.chat.id, vector.clone()).await?;
+                }
+            }
+
+            if !title.is_empty() {
+                bot.send_message(msg.chat.id, title).await?;
+            }
+
+            log::info!("{}", format!("ChatID: {} -> Tiktok: {}", msg.chat.id, link));
+        }
+        Err(err) => {
+            let error_text = format!("{}\n\n<i>{}</i>",
+                                     t!(&LocalizedMessage::ErrorMessage.to_string()), err);
+
+            bot.send_message(msg.chat.id, &error_text)
+                .parse_mode(ParseMode::Html)
+                .await?;
+
+            log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
+                            msg.chat.id, link));
+        }
     };
 
     Ok(())
