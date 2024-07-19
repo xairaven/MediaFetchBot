@@ -47,7 +47,10 @@ pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
 
 async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<dyn std::error::Error>> {
     let mut headers = header::HeaderMap::new();
-    headers.insert("x-rapidapi-host", "tiktok-download-without-watermark.p.rapidapi.com".parse().unwrap());
+
+    let host_value: HeaderValue = "tiktok-download-without-watermark.p.rapidapi.com".parse()
+        .map_err(|_| BotError::WrongApiHost)?;
+    headers.insert("x-rapidapi-host", host_value);
 
     let key_value: HeaderValue = tiktok_api_key.parse()
         .map_err(|_| BotError::WrongApiKey)?;
