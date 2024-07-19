@@ -6,19 +6,19 @@ use serde_json::Value;
 use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
 use url::{ParseError, Url};
 
-use crate::error::BotError;
+use crate::tiktok::api_error::ApiError;
 use crate::tiktok::media_format::MediaFormat;
 use crate::tiktok::raw_media::RawMedia;
 
 pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
-                          -> Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), BotError> {
+                          -> Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ApiError> {
     let tiktok_api_key: &str = match tiktok_api_key {
-        None => { return Err(BotError::ApiKeyTiktokMissing) }
+        None => { return Err(ApiError::ApiKeyTiktokMissing) }
         Some(value) => value
     };
 
     let response = get_response(tiktok_api_key, link).await;
-    let response = response.map_err(|_| BotError::FailedGetResponse)?;
+    let response = response.map_err(|_| ApiError::FailedGetResponse)?;
 
     let response_results = parse_response(response)?;
     let mut files: HashMap<MediaFormat, Vec<InputMedia>> = HashMap::new();
@@ -29,7 +29,7 @@ pub async fn process_link(tiktok_api_key: &Option<String>, link: String)
         let href = raw_media.href;
 
         let url: Result<Url, ParseError> = href.parse();
-        let url = url.map_err(|_| BotError::FailedParseUrl)?;
+        let url = url.map_err(|_| ApiError::FailedParseUrl)?;
 
         let file = InputFile::url(url);
         let file = match &raw_media.format {
@@ -49,11 +49,11 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<
     let mut headers = header::HeaderMap::new();
 
     let host_value: HeaderValue = "tiktok-download-without-watermark.p.rapidapi.com".parse()
-        .map_err(|_| BotError::WrongApiHost)?;
+        .map_err(|_| ApiError::WrongApiHost)?;
     headers.insert("x-rapidapi-host", host_value);
 
     let key_value: HeaderValue = tiktok_api_key.parse()
-        .map_err(|_| BotError::WrongApiKey)?;
+        .map_err(|_| ApiError::WrongApiKey)?;
     headers.insert("x-rapidapi-key", key_value);
 
     let client = reqwest::Client::builder()
@@ -71,10 +71,10 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<
     Ok(response)
 }
 
-fn parse_response(response: String) -> Result<(String, Vec<RawMedia>), BotError> {
+fn parse_response(response: String) -> Result<(String, Vec<RawMedia>), ApiError> {
     let parsed_response: serde_json::error::Result<Value> = serde_json::from_str(&response);
     let parsed_response = parsed_response
-        .map_err(|_| BotError::FailedParseResponse)?;
+        .map_err(|_| ApiError::FailedParseResponse)?;
 
     let mut results: Vec<RawMedia> = vec![];
 
@@ -87,7 +87,7 @@ fn parse_response(response: String) -> Result<(String, Vec<RawMedia>), BotError>
 
     let play = match &data["play"] {
         Value::String(value) => value.to_string(),
-        _ => { return Err(BotError::NoResult); }
+        _ => { return Err(ApiError::NoResult); }
     };
 
     // Supposing that if there "images" field -- then, it's photo-slide format.

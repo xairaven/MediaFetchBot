@@ -14,7 +14,6 @@ mod bot_commands;
 mod bot_config;
 mod command;
 mod errors;
-mod error;
 mod link_type;
 mod localized_messages;
 mod tiktok;

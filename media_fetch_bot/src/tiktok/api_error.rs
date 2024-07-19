@@ -1,7 +1,7 @@
 use thiserror::Error;
 
 #[derive(Debug, Error)]
-pub enum BotError {
+pub enum ApiError {
     #[error("Tiktok API Key missing. Tiktok module is not working.")]
     ApiKeyTiktokMissing,
 
