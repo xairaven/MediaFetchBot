@@ -117,7 +117,7 @@ async fn handle_message(bot: Bot, msg: Message,
 
 async fn handle_command(bot: Bot, msg: Message, cmd: BotCommand) -> ResponseResult<()> {
     match cmd {
-        BotCommand::Help => bot.send_message(msg.chat.id, Command::Help.to_string())
+        BotCommand::Help => bot.send_message(msg.chat.id, t!(&Command::Help.to_string()))
             .parse_mode(ParseMode::Html)
             .await?,
     };
