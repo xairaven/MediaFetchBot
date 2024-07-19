@@ -1,4 +1,4 @@
-use crate::errors::env::EnvError;
+use crate::general_errors::env::EnvError;
 use dotenvy::dotenv;
 use log::LevelFilter;
 use std::env;

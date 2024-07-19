@@ -1,6 +1,6 @@
 use crate::bot_commands::BotCommand;
 use crate::bot_config::BotConfig;
-use crate::errors::user_input::UserInputError;
+use crate::general_errors::user_input::UserInputError;
 use crate::link_type::LinkType;
 use crate::localized_messages::LocalizedMessage;
 use crate::tiktok::errors::error_type::ErrorType;
@@ -12,7 +12,7 @@ use pretty_env_logger::env_logger::Target;
 
 mod bot_commands;
 mod bot_config;
-mod errors;
+mod general_errors;
 mod link_type;
 mod localized_messages;
 mod tiktok;
