@@ -38,11 +38,9 @@ async fn main() {
 
     let bot = Bot::new(&bot_config.token);
 
-    let bot_name = bot_config.name.clone();
-    let tiktok_key = bot_config.tiktok_api_key.clone();
-
     Dispatcher::builder(bot, Update::filter_message().endpoint(handle_message))
-        .dependencies(dptree::deps![bot_name, tiktok_key])
+        .dependencies(dptree::deps![bot_config.name,
+            bot_config.tiktok_api_key])
         .build()
         .dispatch()
         .await;
