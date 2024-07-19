@@ -1,6 +1,6 @@
 use thiserror::Error;
-use crate::tiktok::api_error::ApiError;
-use crate::tiktok::user_error::UserError;
+use crate::tiktok::errors::api_error::ApiError;
+use crate::tiktok::errors::user_error::UserError;
 
 #[derive(Error, Debug)]
 pub enum ErrorType {

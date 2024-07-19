@@ -5,12 +5,11 @@ use std::collections::HashMap;
 use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
 use url::{Url};
 
-use crate::tiktok::api_error::ApiError;
-use crate::tiktok::error_type::ErrorType;
-
+use crate::tiktok::errors::api_error::ApiError;
+use crate::tiktok::errors::error_type::ErrorType;
+use crate::tiktok::errors::user_error::UserError;
 use crate::tiktok::media_format::MediaFormat;
 use crate::tiktok::raw_media::RawMedia;
-use crate::tiktok::user_error::UserError;
 
 type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
 
