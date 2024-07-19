@@ -1,4 +1,4 @@
-use crate::error::BotError;
+use crate::errors::env::EnvError;
 use dotenvy::dotenv;
 use std::env;
 use log::LevelFilter;
@@ -11,23 +11,23 @@ pub struct BotConfig {
 }
 
 impl BotConfig {
-    pub fn build() -> Result<BotConfig, BotError> {
+    pub fn build() -> Result<BotConfig, EnvError> {
         // Loading .env from the parent folder
         if dotenv().is_err() {
-            return Err(BotError::EnvIsNotLoaded);
+            return Err(EnvError::ConfigNotLoaded);
         }
 
         // Loading token
         let token = env::var("BOT_TOKEN")
-            .map_err(|_| BotError::EnvBotToken)?;
+            .map_err(|_| EnvError::TokenNotLoaded)?;
 
         // Loading bot name
         let name = env::var("BOT_NAME")
-            .map_err(|_| BotError::EnvBotName)?;
+            .map_err(|_| EnvError::NameNotLoaded)?;
 
         // Loading log level
         let log_level = env::var("LOG_LEVEL")
-            .map_err(|_| BotError::EnvBotLogLevel)?;
+            .map_err(|_| EnvError::LogLevelNotLoaded)?;
         let log_level = match log_level.to_lowercase().trim() {
             "off" => LevelFilter::Off,
             "error" => LevelFilter::Error,
@@ -35,7 +35,7 @@ impl BotConfig {
             "info" => LevelFilter::Info,
             "debug" => LevelFilter::Debug,
             "trace" => LevelFilter::Trace,
-            _ => return Err(BotError::EnvBotLogLevel)
+            _ => return Err(EnvError::LogLevelUndefined)
         };
 
         // Loading tiktok_api_key
