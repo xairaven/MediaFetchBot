@@ -17,23 +17,14 @@ pub enum BotError {
     #[error("EnvEnvBotLogLevel: Something wrong with .env LOG_LEVEL. May be, there's no field with this name.")]
     EnvBotLogLevel,
 
-    #[error("FailedGetUserMessage: Failed to get user message.")]
-    FailedGetUserMessage,
-
     #[error("FailedGetResponse: Failed to get a response from API.")]
     FailedGetResponse,
-
-    #[error("FailedExtractingHtml: Failed to extract html.")]
-    FailedExtractingHtml,
 
     #[error("FailedParseResponse: Failed to parse response.")]
     FailedParseResponse,
 
     #[error("FailedParseUrl: Failed to parse final url.")]
     FailedParseUrl,
-
-    #[error("InvalidResult: All steps done, but result is invalid.")]
-    InvalidResult,
 
     #[error("NoResult: Unfortunately, there's no result by this query.")]
     NoResult,
