@@ -93,6 +93,9 @@ async fn handle_command(bot: Bot, msg: Message, cmd: BotCommand) -> ResponseResu
         BotCommand::Help => bot.send_message(msg.chat.id, t!(&BotCommand::Help.to_string()))
             .parse_mode(ParseMode::Html)
             .await?,
+        BotCommand::Start => bot.send_message(msg.chat.id, t!(&BotCommand::Start.to_string()))
+            .parse_mode(ParseMode::Html)
+            .await?,
     };
 
     Ok(())
