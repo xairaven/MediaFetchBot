@@ -26,7 +26,7 @@ rust_i18n::i18n!("locales");
 async fn main() {
     rust_i18n::set_locale("en");
 
-    let bot_config = BotConfig::build().unwrap_or_else(|err| {
+    let bot_config = BotConfig::from_env().unwrap_or_else(|err| {
         log::error!("Error: {err}");
         process::exit(1);
     });

@@ -12,7 +12,7 @@ pub struct BotConfig {
 }
 
 impl BotConfig {
-    pub fn build() -> Result<BotConfig, EnvError> {
+    pub fn from_env() -> Result<BotConfig, EnvError> {
         // Loading .env from the parent folder
         if dotenv().is_err() {
             return Err(EnvError::ConfigNotLoaded);
