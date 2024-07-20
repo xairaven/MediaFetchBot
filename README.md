@@ -1,8 +1,8 @@
 <h1 align="center">Media Fetch Bot</h1>
 
-Looking for an easy way to **download TikTok videos?**
+Looking for an easy way to **download TikTok or Instagram content?**
 I'm proud to present **an open-source Telegram bot** written in 🦀**Rust**🦀 using the **Teloxide**🤖 library.
-This bot allows you to effortlessly download TikTok videos by **simply sending a link**.
+This bot allows you to effortlessly download content by **simply sending a link**.
 
 ![](https://img.shields.io/github/actions/workflow/status/xairaven/MediaFetchBot/release_bot.yml?style=plastic)
 ![](https://img.shields.io/github/v/release/xairaven/MediaFetchBot?style=plastic)
@@ -15,6 +15,7 @@ This bot allows you to effortlessly download TikTok videos by **simply sending a
 <h2>What do you need to start:</h2>
 
 - **[TikTok Download API Key](https://rapidapi.com/yi005/api/tiktok-download-without-watermark)**
+- **[Instagram Bulk Scraper API Key](https://rapidapi.com/mrngstar/api/instagram-bulk-scraper-latest)**
 - **[Telegram Bot Token](https://t.me/BotFather)**
 - **Windows 10 x64 or Ubuntu x64** *<optional>*
 - **Docker** *<optional>*
@@ -28,6 +29,7 @@ BOT_TOKEN=...
 BOT_NAME=your_telegram_bot_username
 LOG_LEVEL=...
 TIKTOK_API_KEY=...
+INSTAGRAM_API_KEY=...
 ```
 
 If you want to change the log level (default is `ERROR`), set the LOG_LEVEL variable to the desired level (`error`, `warn`, `info`, `debug`, `trace`, `off`).
@@ -85,7 +87,7 @@ Congrats!🥳 The bot is working now.
 <h2>Available Inputs:</h2>
 
 - `/help` — Instruction. You can also change localization text. For that, change the text in `media_fetch_bot/locales/en.json`.
-- TikTok Link — Get your content! Videos and Photo Slides available.
+- TikTok or Instagram Link — Get your content! Videos, Photo Slides, Instagram Photos, Reels and Stories available.
 
 <h2>Contributions</h2>
 
