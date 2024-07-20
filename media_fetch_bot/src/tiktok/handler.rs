@@ -8,8 +8,8 @@ use url::{Url};
 use crate::errors::api::ApiError;
 use crate::errors::error_type::ErrorType;
 use crate::errors::user_input::UserInputError;
-use crate::tiktok::media_format::MediaFormat;
-use crate::tiktok::raw_media::RawMedia;
+use crate::rapid_api::media_format::MediaFormat;
+use crate::rapid_api::raw_media::RawMedia;
 use crate::utils::response_processing;
 
 type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
@@ -74,14 +74,14 @@ fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
     // So, "play" field -- link to mp3 music.
     // Otherwise -- link to mp4 video. No "images" field.
     if let Value::Array(vector) = &data["images"] {
-        results.push(RawMedia::new(play, MediaFormat::Music));
+        results.push(RawMedia::music(play));
 
         for value in vector {
             if let Value::String(link) = value {
-                results.push(RawMedia::new(link.to_string(), MediaFormat::Image));
+                results.push(RawMedia::image(link.to_string()));
             }
         }
-    } else { results.push(RawMedia::new(play, MediaFormat::Video)); }
+    } else { results.push(RawMedia::video(play)); }
 
     Ok((title, results))
 }

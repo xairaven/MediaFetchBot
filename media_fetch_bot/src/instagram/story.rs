@@ -1,6 +1,6 @@
 use serde_json::Value;
 use crate::errors::user_input::UserInputError;
-use crate::instagram::raw_media::RawMedia;
+use crate::rapid_api::raw_media::RawMedia;
 
 pub fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError>{
     let mut result_vector: Vec<RawMedia> = Vec::new();

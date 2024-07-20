@@ -17,6 +17,7 @@ mod link_type;
 mod tiktok;
 mod instagram;
 mod utils;
+mod rapid_api;
 
 
 // Defining folder with locales. Path: media_fetch_bot/locales
