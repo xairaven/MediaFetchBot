@@ -122,7 +122,7 @@ async fn handle_instagram_link(link: &str, api_key: Option<String>,
 
 type RapidApiResults = Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ErrorType>;
 async fn handle_rapid(results: RapidApiResults, bot: &Bot, msg: &Message, link: &str)
-    -> ResponseResult<()> {
+                      -> ResponseResult<()> {
     match results {
         Ok(tuple) => {
             // This hashmap logic needed because library can group documents only by the same type.
@@ -164,11 +164,11 @@ fn form_error_text(err: ErrorType, chat_id: &ChatId, link: &str) -> String {
 
             format!("{}", t!(&err.to_string()))
         }
-        ErrorType::User(err) => {
+        ErrorType::User(specific_err) => {
             log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
                             chat_id, link));
 
-            format!("{}", t!(&err.to_string()))
+            format!("{}", t!(&specific_err.to_string()))
         }
     }
 }

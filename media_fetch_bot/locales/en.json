@@ -23,6 +23,6 @@
 
   "NoResult": "Unfortunately, there's no content at this link.",
 
-  "TikTokBackendError": "<b>Error message:</b>\nSomething is wrong either with the bot or with TikTok API.\nPlease report this incident to the bot administrator.",
-  "TikTokUserError": "User Error. Something wrong with user input"
+  "BackendError": "<b>Error message:</b>\nSomething is wrong either with the bot or with API.\nPlease report this incident to the bot administrator.",
+  "UserError": "User Error. Something wrong with user input"
 }
