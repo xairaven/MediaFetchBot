@@ -122,20 +122,7 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
             log::info!("{}", format!("ChatID: {} -> Tiktok: {}", msg.chat.id, link));
         }
         Err(err) => {
-            let error_text = match err {
-                ErrorType::Backend(ref specific_err) => {
-                    log::error!("{}", format!("{}. ChatID: {} -> ErrQuery: {}",
-                            specific_err, msg.chat.id, link));
-
-                    format!("{}", t!(&err.to_string()))
-                }
-                ErrorType::User(err) => {
-                    log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
-                            msg.chat.id, link));
-
-                    format!("{}", t!(&err.to_string()))
-                }
-            };
+            let error_text = form_error_text(err, &msg.chat.id, &link);
 
             bot.send_message(msg.chat.id, error_text)
                 .parse_mode(ParseMode::Html)
@@ -156,9 +143,30 @@ async fn handle_instagram_link(link: &str, api_key: Option<String>,
             log::info!("{}", format!("ChatID: {} -> Instagram: {}", msg.chat.id, link));
         }
         Err(err) => {
-            bot.send_message(msg.chat.id, err.to_string()).await?;
+            let error_text = form_error_text(err, &msg.chat.id, &link);
+
+            bot.send_message(msg.chat.id, error_text)
+                .parse_mode(ParseMode::Html)
+                .await?;
         }
     }
 
     Ok(())
+}
+
+fn form_error_text(err: ErrorType, chat_id: &ChatId, link: &str) -> String {
+    match err {
+        ErrorType::Backend(ref specific_err) => {
+            log::error!("{}", format!("{}. ChatID: {} -> ErrQuery: {}",
+                            specific_err, chat_id, link));
+
+            format!("{}", t!(&err.to_string()))
+        }
+        ErrorType::User(err) => {
+            log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}",
+                            chat_id, link));
+
+            format!("{}", t!(&err.to_string()))
+        }
+    }
 }
