@@ -108,8 +108,6 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
 
     handle_rapid(results, bot, msg, link).await?;
 
-    log::info!("{}", format!("ChatID: {} -> Tiktok: {}", msg.chat.id, link));
-
     Ok(())
 }
 
@@ -118,8 +116,6 @@ async fn handle_instagram_link(link: &str, api_key: Option<String>,
     let results = instagram::handler::get_results(api_key, link.to_string()).await;
 
     handle_rapid(results, bot, msg, link).await?;
-
-    log::info!("{}", format!("ChatID: {} -> Instagram: {}", msg.chat.id, link));
 
     Ok(())
 }
@@ -145,6 +141,8 @@ async fn handle_rapid(results: RapidApiResults, bot: &Bot, msg: &Message, link: 
             if !title.is_empty() {
                 bot.send_message(msg.chat.id, title).await?;
             }
+
+            log::info!("{}", format!("ChatID: {} -> Instagram: {}", msg.chat.id, link));
         }
         Err(err) => {
             let error_text = form_error_text(err, &msg.chat.id, &link);
