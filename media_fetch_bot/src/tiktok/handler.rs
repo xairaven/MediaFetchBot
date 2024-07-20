@@ -18,8 +18,7 @@ pub async fn get_results(tiktok_api_key: Option<String>, link: String)
                          -> Result<(String, InputMediaMap), ErrorType> {
     let tiktok_api_key: String = tiktok_api_key.ok_or(ApiError::ApiKeyTiktokMissing)?;
 
-    let response = get_response(&tiktok_api_key, link).await
-        .map_err(|_| ApiError::FailedGetResponse)?;
+    let response = get_response(&tiktok_api_key, link).await?;
     let json = response_processing::to_json(response)?;
 
     let (post_title, raw_media_documents) = parse_json(json)?;
@@ -29,7 +28,7 @@ pub async fn get_results(tiktok_api_key: Option<String>, link: String)
     Ok((post_title, input_media_map))
 }
 
-async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<dyn std::error::Error>> {
+async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, ApiError> {
     let mut headers = header::HeaderMap::new();
 
     let host_value: HeaderValue = "tiktok-download-without-watermark.p.rapidapi.com".parse()
@@ -49,10 +48,17 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, Box<
 
     let response = client.get(request_body)
         .headers(headers)
-        .send().await?
-        .text().await?;
+        .send().await
+        .map_err(|_| ApiError::FailedGetResponse)?;
 
-    Ok(response)
+    if response.status().is_client_error() {
+        return Err(ApiError::TiktokQuotaExceeded.into());
+    }
+
+    let response_text = response.text().await
+        .map_err(|_| ApiError::FailedGetResponse)?;
+
+    Ok(response_text)
 }
 
 fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {

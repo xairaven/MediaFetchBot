@@ -17,6 +17,9 @@ pub enum ApiError {
     #[error("FailedParseUrl")]
     FailedParseUrl,
 
+    #[error("TiktokQuotaExceeded")]
+    TiktokQuotaExceeded,
+
     #[error("WrongApiHost")]
     WrongApiHost,
 
