@@ -10,6 +10,7 @@
   "FailedParseUrl": "Failed to parse final url.",
   "WrongApiHost": "x-rapidapi-host header is wrong.",
   "WrongApiKey": "x-rapidapi-key header is wrong.",
+  "WrongMediaFormat": "Wrong media format passed to instagram handlers",
 
   "ConfigNotLoaded": "Something wrong with .env file. May be, it not exists.",
   "LogLevelNotLoaded": "Something wrong with .env LOG_LEVEL. May be, there's no field with this name.",
