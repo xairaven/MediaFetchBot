@@ -3,7 +3,8 @@
   "Help": "<b>Welcome to the Media Downloader Bot!</b>\n\n<b>Commands:</b>\n- /help: Display this help message.\n\n<b>How to use:</b>\nTo download media from TikTok simply send a TikTok video or photo slides link directly to the bot.\nThe bot will process the link and send the media file back to you.\n\n<b>Additional Notes:</b>\nEnsure the TikTok link is directly accessible (not private or restricted).\n\n<b>Supported formats:</b> Video and photo slides.",
 
 
-  "ApiKeyTiktokMissing": "Tiktok API Key missing. Tiktok module is not working.",
+  "ApiKeyTiktokMissing": "Tiktok API Key missing. Module is not working.",
+  "ApiKeyInstagramMissing": "Instagram API Key missing. Module is not working.",
   "FailedGetResponse": "Failed to get a response from API.",
   "FailedParseResponse": "Failed to parse response.",
   "FailedParseUrl": "Failed to parse final url.",
