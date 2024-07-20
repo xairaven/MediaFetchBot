@@ -52,7 +52,7 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, ApiE
         .map_err(|_| ApiError::FailedGetResponse)?;
 
     if response.status().is_client_error() {
-        return Err(ApiError::TiktokQuotaExceeded.into());
+        return Err(ApiError::TiktokQuotaExceeded);
     }
 
     let response_text = response.text().await

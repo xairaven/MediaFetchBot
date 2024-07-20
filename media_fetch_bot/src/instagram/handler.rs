@@ -18,8 +18,7 @@ pub async fn get_results(api_key: Option<String>, link: String)
     let api_key: String = api_key.ok_or(ApiError::ApiKeyInstagramMissing)?;
 
     let content_type = ContentType::choose(&link);
-    let response = get_response(&api_key, &content_type, link).await
-        .map_err(|_| ApiError::FailedGetResponse)?;
+    let response = get_response(&api_key, &content_type, link).await?;
     let json = response_processing::to_json(response)?;
 
     let (caption, raw_medias) = match content_type {
@@ -32,7 +31,7 @@ pub async fn get_results(api_key: Option<String>, link: String)
     Ok((caption, input_media_map))
 }
 
-async fn get_response(api_key: &str, content_type: &ContentType, link: String) -> Result<String, Box<dyn std::error::Error>> {
+async fn get_response(api_key: &str, content_type: &ContentType, link: String) -> Result<String, ApiError> {
     let mut headers = HeaderMap::new();
     headers.insert("Content-Type", "application/json".parse().unwrap());
 
@@ -59,10 +58,18 @@ async fn get_response(api_key: &str, content_type: &ContentType, link: String) -
     let response = client.post(endpoint_url)
         .headers(headers)
         .body(request_body)
-        .send().await?
-        .text().await?;
+        .send().await
+        .map_err(|_| ApiError::FailedGetResponse)?;
 
-    Ok(response)
+
+    if response.status().is_client_error() {
+        return Err(ApiError::InstagramQuotaExceeded);
+    }
+
+    let response_text = response.text().await
+        .map_err(|_| ApiError::FailedGetResponse)?;
+
+    Ok(response_text)
 }
 
 fn convert_raw_to_input_media(vec: Vec<RawMedia>) -> Result<InputMediaMap, ApiError> {
