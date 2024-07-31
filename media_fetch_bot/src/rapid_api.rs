@@ -35,7 +35,7 @@ pub async fn send_results(results: RapidApiResults, bot: &Bot, msg: &Message, li
             log::info!("{}", format!("ChatID: {} -> {}", msg.chat.id, link));
         }
         Err(err) => {
-            let error_text = form_error_text(err, &msg.chat.id, &link);
+            let error_text = form_error_text(err, &msg.chat.id, link);
 
             bot.send_message(msg.chat.id, error_text)
                 .parse_mode(ParseMode::Html)
