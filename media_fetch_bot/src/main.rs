@@ -5,9 +5,11 @@ use crate::errors::user_input::UserInputError;
 use crate::link_type::LinkType;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
+use teloxide::adaptors::throttle::{Limits};
 use teloxide::types::{ParseMode};
 use std::{process};
 use pretty_env_logger::env_logger::Target;
+use teloxide::adaptors::Throttle;
 
 mod bot_commands;
 mod bot_config;
@@ -39,7 +41,8 @@ async fn main() {
 
     log::info!("Starting bot...");
 
-    let bot = Bot::new(&bot_config.token);
+    let bot = Bot::new(&bot_config.token)
+        .throttle(Limits::default());
 
     Dispatcher::builder(bot, Update::filter_message().endpoint(handle_message))
         .dependencies(dptree::deps![bot_config.name,
@@ -51,7 +54,7 @@ async fn main() {
         .await;
 }
 
-async fn handle_message(bot: Bot, msg: Message,
+async fn handle_message(bot: Throttle<Bot>, msg: Message,
                         bot_name: String,
                         tiktok_api_key: Option<String>,
                         instagram_api_key: Option<String>) -> ResponseResult<()> {
@@ -87,7 +90,7 @@ async fn handle_message(bot: Bot, msg: Message,
     }
 }
 
-async fn handle_command(bot: Bot, msg: Message, cmd: BotCommand) -> ResponseResult<()> {
+async fn handle_command(bot: Throttle<Bot>, msg: Message, cmd: BotCommand) -> ResponseResult<()> {
     match cmd {
         BotCommand::Help => bot.send_message(msg.chat.id, t!(&BotCommand::Help.to_string()))
             .parse_mode(ParseMode::Html)
@@ -101,7 +104,7 @@ async fn handle_command(bot: Bot, msg: Message, cmd: BotCommand) -> ResponseResu
 }
 
 async fn handle_tiktok_link(link: &str, api_key: Option<String>,
-                            bot: &Bot, msg: &Message) -> ResponseResult<()> {
+                            bot: &Throttle<Bot>, msg: &Message) -> ResponseResult<()> {
     let results
         = tiktok::handler::get_results(api_key, link.to_string()).await;
 
@@ -111,7 +114,7 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
 }
 
 async fn handle_instagram_link(link: &str, api_key: Option<String>,
-                               bot: &Bot, msg: &Message) -> ResponseResult<()> {
+                               bot: &Throttle<Bot>, msg: &Message) -> ResponseResult<()> {
     let results = instagram::handler::get_results(api_key, link.to_string()).await;
 
     rapid_api::send_results(results, bot, msg, link).await?;

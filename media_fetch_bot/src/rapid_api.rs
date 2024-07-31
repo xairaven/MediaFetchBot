@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use teloxide::adaptors::Throttle;
 use teloxide::Bot;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{Message, Requester, ResponseResult};
@@ -11,7 +12,7 @@ pub mod media_format;
 pub mod raw_media;
 
 type RapidApiResults = Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ErrorType>;
-pub async fn send_results(results: RapidApiResults, bot: &Bot, msg: &Message, link: &str)
+pub async fn send_results(results: RapidApiResults, bot: &Throttle<Bot>, msg: &Message, link: &str)
                       -> ResponseResult<()> {
     match results {
         Ok(tuple) => {
