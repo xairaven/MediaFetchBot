@@ -5,11 +5,9 @@ use crate::errors::user_input::UserInputError;
 use crate::link_type::LinkType;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
-use teloxide::types::{InputMedia, ParseMode};
+use teloxide::types::{ParseMode};
 use std::{process};
-use std::collections::HashMap;
 use pretty_env_logger::env_logger::Target;
-use crate::rapid_api::media_format::MediaFormat;
 
 mod bot_commands;
 mod bot_config;
@@ -106,7 +104,7 @@ async fn handle_tiktok_link(link: &str, api_key: Option<String>,
     let results
         = tiktok::handler::get_results(api_key, link.to_string()).await;
 
-    handle_rapid(results, bot, msg, link).await?;
+    rapid_api::send_results(results, bot, msg, link).await?;
 
     Ok(())
 }
@@ -115,43 +113,7 @@ async fn handle_instagram_link(link: &str, api_key: Option<String>,
                                bot: &Bot, msg: &Message) -> ResponseResult<()> {
     let results = instagram::handler::get_results(api_key, link.to_string()).await;
 
-    handle_rapid(results, bot, msg, link).await?;
-
-    Ok(())
-}
-
-type RapidApiResults = Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ErrorType>;
-async fn handle_rapid(results: RapidApiResults, bot: &Bot, msg: &Message, link: &str)
-                      -> ResponseResult<()> {
-    match results {
-        Ok(tuple) => {
-            // This hashmap logic needed because library can group documents only by the same type.
-            // But API returns just links.
-
-            let title = tuple.0;
-            let files = tuple.1;
-            let keys = files.keys();
-            for key in keys {
-                let vector = files.get(key);
-                if let Some(vector) = vector {
-                    bot.send_media_group(msg.chat.id, vector.clone()).await?;
-                }
-            }
-
-            if !title.is_empty() {
-                bot.send_message(msg.chat.id, title).await?;
-            }
-
-            log::info!("{}", format!("ChatID: {} -> Instagram: {}", msg.chat.id, link));
-        }
-        Err(err) => {
-            let error_text = form_error_text(err, &msg.chat.id, &link);
-
-            bot.send_message(msg.chat.id, error_text)
-                .parse_mode(ParseMode::Html)
-                .await?;
-        }
-    }
+    rapid_api::send_results(results, bot, msg, link).await?;
 
     Ok(())
 }
