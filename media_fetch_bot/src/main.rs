@@ -45,6 +45,7 @@ async fn main() {
         .dependencies(dptree::deps![bot_config.name,
             bot_config.tiktok_api_key,
             bot_config.instagram_api_key])
+        .enable_ctrlc_handler()
         .build()
         .dispatch()
         .await;
