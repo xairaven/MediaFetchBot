@@ -1,8 +1,11 @@
+use strum_macros::Display;
 use teloxide::macros::BotCommands;
-use strum_macros::{Display};
 
 #[derive(Display, BotCommands, Clone, Debug)]
-#[command(rename_rule = "lowercase", description = "These commands are supported:")]
+#[command(
+    rename_rule = "lowercase",
+    description = "These commands are supported:"
+)]
 pub enum BotCommand {
     #[command(description = "Welcome message.")]
     Start,

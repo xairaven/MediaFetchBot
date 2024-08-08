@@ -7,5 +7,5 @@ pub enum MediaFormat {
     Music,
 
     // TikTok, Instagram
-    Video
+    Video,
 }

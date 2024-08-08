@@ -3,7 +3,7 @@ use reqwest::header::HeaderValue;
 use serde_json::Value;
 use std::collections::HashMap;
 use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
-use url::{Url};
+use url::Url;
 
 use crate::errors::api::ApiError;
 use crate::errors::error_type::ErrorType;
@@ -14,8 +14,10 @@ use crate::utils::response_processing;
 
 type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
 
-pub async fn get_results(tiktok_api_key: Option<String>, link: String)
-                         -> Result<(String, InputMediaMap), ErrorType> {
+pub async fn get_results(
+    tiktok_api_key: Option<String>,
+    link: String,
+) -> Result<(String, InputMediaMap), ErrorType> {
     let tiktok_api_key: String = tiktok_api_key.ok_or(ApiError::ApiKeyTiktokMissing)?;
 
     let response = get_response(&tiktok_api_key, link).await?;
@@ -31,12 +33,12 @@ pub async fn get_results(tiktok_api_key: Option<String>, link: String)
 async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, ApiError> {
     let mut headers = header::HeaderMap::new();
 
-    let host_value: HeaderValue = "tiktok-download-without-watermark.p.rapidapi.com".parse()
+    let host_value: HeaderValue = "tiktok-download-without-watermark.p.rapidapi.com"
+        .parse()
         .map_err(|_| ApiError::WrongApiHost)?;
     headers.insert("x-rapidapi-host", host_value);
 
-    let key_value: HeaderValue = tiktok_api_key.parse()
-        .map_err(|_| ApiError::WrongApiKey)?;
+    let key_value: HeaderValue = tiktok_api_key.parse().map_err(|_| ApiError::WrongApiKey)?;
     headers.insert("x-rapidapi-key", key_value);
 
     let client = reqwest::Client::builder()
@@ -44,18 +46,25 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, ApiE
         .build()
         .unwrap();
 
-    let request_body = format!("https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url={}&hd=0", link);
+    let request_body = format!(
+        "https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url={}&hd=0",
+        link
+    );
 
-    let response = client.get(request_body)
+    let response = client
+        .get(request_body)
         .headers(headers)
-        .send().await
+        .send()
+        .await
         .map_err(|_| ApiError::FailedGetResponse)?;
 
     if response.status().is_client_error() {
         return Err(ApiError::TiktokQuotaExceeded);
     }
 
-    let response_text = response.text().await
+    let response_text = response
+        .text()
+        .await
         .map_err(|_| ApiError::FailedGetResponse)?;
 
     Ok(response_text)
@@ -68,12 +77,14 @@ fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
 
     let title: String = match &data["title"] {
         Value::String(value) => value.to_string(),
-        _ => String::new()
+        _ => String::new(),
     };
 
     let play = match &data["play"] {
         Value::String(value) => value.to_string(),
-        _ => { return Err(UserInputError::NoResult); }
+        _ => {
+            return Err(UserInputError::NoResult);
+        }
     };
 
     // Supposing that if there "images" field -- then, it's photo-slide format.
@@ -87,26 +98,28 @@ fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
                 results.push(RawMedia::image(link.to_string()));
             }
         }
-    } else { results.push(RawMedia::video(play)); }
+    } else {
+        results.push(RawMedia::video(play));
+    }
 
     Ok((title, results))
 }
 
-fn convert_raw_to_input_media(raw_media_documents: Vec<RawMedia>) -> Result<InputMediaMap, ApiError> {
-
+fn convert_raw_to_input_media(
+    raw_media_documents: Vec<RawMedia>,
+) -> Result<InputMediaMap, ApiError> {
     let mut files: InputMediaMap = HashMap::new();
     // Parsing vector of results
     for raw_media in raw_media_documents {
         let href = raw_media.href;
 
-        let url: Url = href.parse()
-            .map_err(|_| ApiError::FailedParseUrl)?;
+        let url: Url = href.parse().map_err(|_| ApiError::FailedParseUrl)?;
 
         let file = InputFile::url(url);
         let file = match &raw_media.format {
-            MediaFormat::Image => { InputMedia::Photo(InputMediaPhoto::new(file)) }
-            MediaFormat::Music => { InputMedia::Audio(InputMediaAudio::new(file)) }
-            MediaFormat::Video => { InputMedia::Video(InputMediaVideo::new(file)) }
+            MediaFormat::Image => InputMedia::Photo(InputMediaPhoto::new(file)),
+            MediaFormat::Music => InputMedia::Audio(InputMediaAudio::new(file)),
+            MediaFormat::Video => InputMedia::Video(InputMediaVideo::new(file)),
         };
 
         let vector = files.entry(raw_media.format).or_default();

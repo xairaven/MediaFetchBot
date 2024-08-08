@@ -8,7 +8,7 @@ pub struct BotConfig {
     pub name: String,
     pub log_level: LevelFilter,
     pub tiktok_api_key: Option<String>,
-    pub instagram_api_key: Option<String>
+    pub instagram_api_key: Option<String>,
 }
 
 impl BotConfig {
@@ -19,16 +19,13 @@ impl BotConfig {
         }
 
         // Loading token
-        let token = env::var("BOT_TOKEN")
-            .map_err(|_| EnvError::TokenNotLoaded)?;
+        let token = env::var("BOT_TOKEN").map_err(|_| EnvError::TokenNotLoaded)?;
 
         // Loading bot name
-        let name = env::var("BOT_NAME")
-            .map_err(|_| EnvError::NameNotLoaded)?;
+        let name = env::var("BOT_NAME").map_err(|_| EnvError::NameNotLoaded)?;
 
         // Loading log level
-        let log_level = env::var("LOG_LEVEL")
-            .map_err(|_| EnvError::LogLevelNotLoaded)?;
+        let log_level = env::var("LOG_LEVEL").map_err(|_| EnvError::LogLevelNotLoaded)?;
         let log_level = match log_level.to_lowercase().trim() {
             "off" => LevelFilter::Off,
             "error" => LevelFilter::Error,
@@ -36,21 +33,21 @@ impl BotConfig {
             "info" => LevelFilter::Info,
             "debug" => LevelFilter::Debug,
             "trace" => LevelFilter::Trace,
-            _ => return Err(EnvError::LogLevelUndefined)
+            _ => return Err(EnvError::LogLevelUndefined),
         };
 
         // Loading TikTok API Key
         let tiktok_api_key = env::var("TIKTOK_API_KEY");
         let tiktok_api_key = match tiktok_api_key {
             Ok(value) if !value.trim().is_empty() => Some(value),
-            _ => None
+            _ => None,
         };
 
         // Loading Instagram API Key
         let instagram_api_key = env::var("INSTAGRAM_API_KEY");
         let instagram_api_key = match instagram_api_key {
             Ok(value) if !value.trim().is_empty() => Some(value),
-            _ => None
+            _ => None,
         };
 
         // Returning Config var

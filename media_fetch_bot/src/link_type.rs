@@ -3,7 +3,7 @@ use std::fmt::{Display, Formatter};
 
 pub enum LinkType {
     TikTok,
-    Instagram
+    Instagram,
 }
 
 impl Display for LinkType {

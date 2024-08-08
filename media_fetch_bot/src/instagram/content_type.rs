@@ -2,7 +2,7 @@ use crate::instagram::content_type::ContentType::{Post, Story};
 
 pub enum ContentType {
     Post,
-    Story
+    Story,
 }
 
 impl ContentType {

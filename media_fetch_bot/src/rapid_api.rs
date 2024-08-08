@@ -1,19 +1,23 @@
-use std::collections::HashMap;
-use teloxide::adaptors::Throttle;
-use teloxide::Bot;
-use teloxide::payloads::SendMessageSetters;
-use teloxide::prelude::{Message, Requester, ResponseResult};
-use teloxide::types::{InputMedia, ParseMode};
 use crate::errors::error_type::ErrorType;
 use crate::form_error_text;
 use crate::rapid_api::media_format::MediaFormat;
+use std::collections::HashMap;
+use teloxide::adaptors::Throttle;
+use teloxide::payloads::SendMessageSetters;
+use teloxide::prelude::{Message, Requester, ResponseResult};
+use teloxide::types::{InputMedia, ParseMode};
+use teloxide::Bot;
 
 pub mod media_format;
 pub mod raw_media;
 
 type RapidApiResults = Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ErrorType>;
-pub async fn send_results(results: RapidApiResults, bot: &Throttle<Bot>, msg: &Message, link: &str)
-                      -> ResponseResult<()> {
+pub async fn send_results(
+    results: RapidApiResults,
+    bot: &Throttle<Bot>,
+    msg: &Message,
+    link: &str,
+) -> ResponseResult<()> {
     match results {
         Ok(tuple) => {
             // This hashmap logic needed because library can group documents only by the same type.
