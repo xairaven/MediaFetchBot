@@ -3,12 +3,12 @@ use crate::bot_config::BotConfig;
 use crate::errors::error_type::ErrorType;
 use crate::errors::user_input::UserInputError;
 use crate::link_type::LinkType;
+use chrono::Local;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
 use teloxide::adaptors::throttle::{Limits};
 use teloxide::types::{ParseMode};
 use std::{process};
-use pretty_env_logger::env_logger::Target;
 use teloxide::adaptors::Throttle;
 
 mod bot_commands;
@@ -34,10 +34,23 @@ async fn main() {
         process::exit(1);
     });
 
-    pretty_env_logger::formatted_builder()
-        .filter_level(bot_config.log_level)
-        .target(Target::Stdout)
-        .init();
+    fern::Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
+                "[{} {} {}] {}",
+                Local::now().format("%Y-%m-%d %H:%M"),
+                record.level(),
+                record.target(),
+                message
+            ))
+        })
+        .level(bot_config.log_level)
+        .chain(std::io::stdout())
+        .apply()
+        .unwrap_or_else(|err| {
+            log::error!("Error: {err}");
+            process::exit(1);
+    });
 
     log::info!("Starting bot...");
 
