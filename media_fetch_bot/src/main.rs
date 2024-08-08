@@ -45,6 +45,7 @@ async fn main() {
             ))
         })
         .level(bot_config.log_level)
+        .level_for("teloxide::error_handlers", log::LevelFilter::Debug)
         .chain(std::io::stdout())
         .apply()
         .unwrap_or_else(|err| {
