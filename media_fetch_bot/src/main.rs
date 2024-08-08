@@ -45,6 +45,7 @@ async fn main() {
             ))
         })
         .level(bot_config.log_level)
+        .level_for("teloxide::update_listeners::polling", log::LevelFilter::Debug)
         .level_for("teloxide::error_handlers", log::LevelFilter::Debug)
         .chain(std::io::stdout())
         .apply()
