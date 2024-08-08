@@ -3,7 +3,6 @@ use crate::bot_config::BotConfig;
 use crate::errors::error_type::ErrorType;
 use crate::errors::user_input::UserInputError;
 use crate::link_type::LinkType;
-use chrono::Local;
 use rust_i18n::t;
 use teloxide::{prelude::*, utils::command::BotCommands};
 use teloxide::adaptors::throttle::{Limits};
@@ -15,6 +14,7 @@ mod bot_commands;
 mod bot_config;
 mod errors;
 mod link_type;
+mod logger;
 
 mod tiktok;
 mod instagram;
@@ -34,21 +34,7 @@ async fn main() {
         process::exit(1);
     });
 
-    fern::Dispatch::new()
-        .format(|out, message, record| {
-            out.finish(format_args!(
-                "[{} {} {}] {}",
-                Local::now().format("%Y-%m-%d %H:%M"),
-                record.level(),
-                record.target(),
-                message
-            ))
-        })
-        .level(bot_config.log_level)
-        .level_for("teloxide::update_listeners::polling", log::LevelFilter::Debug)
-        .level_for("teloxide::error_handlers", log::LevelFilter::Debug)
-        .chain(std::io::stdout())
-        .apply()
+    logger::init(bot_config.log_level)
         .unwrap_or_else(|err| {
             log::error!("Error: {err}");
             process::exit(1);
