@@ -2,7 +2,9 @@ use crate::errors::user_input::UserInputError;
 use crate::rapid_api::raw_media::RawMedia;
 use serde_json::Value;
 
-pub fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
+pub fn parse_json(
+    json: Value,
+) -> Result<(String, Vec<RawMedia>), UserInputError> {
     let mut result_vector: Vec<RawMedia> = Vec::new();
 
     let data = &json["data"];

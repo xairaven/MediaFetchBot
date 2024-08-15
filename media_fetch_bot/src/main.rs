@@ -55,18 +55,18 @@ async fn main() {
 }
 
 async fn handle_message(
-    bot: Throttle<Bot>,
-    msg: Message,
-    bot_name: String,
-    tiktok_api_key: Option<String>,
-    instagram_api_key: Option<String>,
+    bot: Throttle<Bot>, msg: Message, bot_name: String,
+    tiktok_api_key: Option<String>, instagram_api_key: Option<String>,
 ) -> ResponseResult<()> {
     let text = match msg.text() {
         None => {
-            bot.send_message(msg.chat.id, t!(&UserInputError::EmptyMessage.to_string()))
-                .await?;
+            bot.send_message(
+                msg.chat.id,
+                t!(&UserInputError::EmptyMessage.to_string()),
+            )
+            .await?;
             return Ok(());
-        }
+        },
         Some(value) => value,
     };
 
@@ -75,12 +75,24 @@ async fn handle_message(
         handle_command(bot, msg, command).await
     } else {
         match text {
-            tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
-                handle_tiktok_link(tiktok_link, tiktok_api_key, &bot, &msg).await?
-            }
-            instagram_link if instagram_link.contains(&LinkType::Instagram.to_string()) => {
-                handle_instagram_link(instagram_link, instagram_api_key, &bot, &msg).await?
-            }
+            tiktok_link
+                if tiktok_link.contains(&LinkType::TikTok.to_string()) =>
+            {
+                handle_tiktok_link(tiktok_link, tiktok_api_key, &bot, &msg)
+                    .await?
+            },
+            instagram_link
+                if instagram_link
+                    .contains(&LinkType::Instagram.to_string()) =>
+            {
+                handle_instagram_link(
+                    instagram_link,
+                    instagram_api_key,
+                    &bot,
+                    &msg,
+                )
+                .await?
+            },
             _ => {
                 bot.send_message(
                     msg.chat.id,
@@ -91,35 +103,34 @@ async fn handle_message(
                     "{}",
                     format!("ChatID: {} -> Undefined: {}", msg.chat.id, text)
                 );
-            }
+            },
         }
 
         Ok(())
     }
 }
 
-async fn handle_command(bot: Throttle<Bot>, msg: Message, cmd: BotCommand) -> ResponseResult<()> {
+async fn handle_command(
+    bot: Throttle<Bot>, msg: Message, cmd: BotCommand,
+) -> ResponseResult<()> {
     match cmd {
         BotCommand::Help => {
             bot.send_message(msg.chat.id, t!(&BotCommand::Help.to_string()))
                 .parse_mode(ParseMode::Html)
                 .await?
-        }
+        },
         BotCommand::Start => {
             bot.send_message(msg.chat.id, t!(&BotCommand::Start.to_string()))
                 .parse_mode(ParseMode::Html)
                 .await?
-        }
+        },
     };
 
     Ok(())
 }
 
 async fn handle_tiktok_link(
-    link: &str,
-    api_key: Option<String>,
-    bot: &Throttle<Bot>,
-    msg: &Message,
+    link: &str, api_key: Option<String>, bot: &Throttle<Bot>, msg: &Message,
 ) -> ResponseResult<()> {
     let results = tiktok::handler::get_results(api_key, link.to_string()).await;
 
@@ -129,12 +140,10 @@ async fn handle_tiktok_link(
 }
 
 async fn handle_instagram_link(
-    link: &str,
-    api_key: Option<String>,
-    bot: &Throttle<Bot>,
-    msg: &Message,
+    link: &str, api_key: Option<String>, bot: &Throttle<Bot>, msg: &Message,
 ) -> ResponseResult<()> {
-    let results = instagram::handler::get_results(api_key, link.to_string()).await;
+    let results =
+        instagram::handler::get_results(api_key, link.to_string()).await;
 
     rapid_api::send_results(results, bot, msg, link).await?;
 
@@ -153,11 +162,14 @@ fn form_error_text(err: ErrorType, chat_id: &ChatId, link: &str) -> String {
             );
 
             format!("{}", t!(&err.to_string()))
-        }
+        },
         ErrorType::User(specific_err) => {
-            log::warn!("{}", format!("ChatID: {} -> ErrQuery: {}", chat_id, link));
+            log::warn!(
+                "{}",
+                format!("ChatID: {} -> ErrQuery: {}", chat_id, link)
+            );
 
             format!("{}", t!(&specific_err.to_string()))
-        }
+        },
     }
 }

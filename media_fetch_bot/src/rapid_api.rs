@@ -11,12 +11,10 @@ use teloxide::Bot;
 pub mod media_format;
 pub mod raw_media;
 
-type RapidApiResults = Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ErrorType>;
+type RapidApiResults =
+    Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ErrorType>;
 pub async fn send_results(
-    results: RapidApiResults,
-    bot: &Throttle<Bot>,
-    msg: &Message,
-    link: &str,
+    results: RapidApiResults, bot: &Throttle<Bot>, msg: &Message, link: &str,
 ) -> ResponseResult<()> {
     match results {
         Ok(tuple) => {
@@ -38,14 +36,14 @@ pub async fn send_results(
             }
 
             log::info!("{}", format!("ChatID: {} -> {}", msg.chat.id, link));
-        }
+        },
         Err(err) => {
             let error_text = form_error_text(err, &msg.chat.id, link);
 
             bot.send_message(msg.chat.id, error_text)
                 .parse_mode(ParseMode::Html)
                 .await?;
-        }
+        },
     }
 
     Ok(())

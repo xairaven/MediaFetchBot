@@ -2,7 +2,9 @@ use reqwest::header;
 use reqwest::header::HeaderValue;
 use serde_json::Value;
 use std::collections::HashMap;
-use teloxide::types::{InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo};
+use teloxide::types::{
+    InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo,
+};
 use url::Url;
 
 use crate::errors::api::ApiError;
@@ -15,10 +17,10 @@ use crate::utils::response_processing;
 type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
 
 pub async fn get_results(
-    tiktok_api_key: Option<String>,
-    link: String,
+    tiktok_api_key: Option<String>, link: String,
 ) -> Result<(String, InputMediaMap), ErrorType> {
-    let tiktok_api_key: String = tiktok_api_key.ok_or(ApiError::ApiKeyTiktokMissing)?;
+    let tiktok_api_key: String =
+        tiktok_api_key.ok_or(ApiError::ApiKeyTiktokMissing)?;
 
     let response = get_response(&tiktok_api_key, link).await?;
     let json = response_processing::to_json(response)?;
@@ -30,15 +32,19 @@ pub async fn get_results(
     Ok((post_title, input_media_map))
 }
 
-async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, ApiError> {
+async fn get_response(
+    tiktok_api_key: &str, link: String,
+) -> Result<String, ApiError> {
     let mut headers = header::HeaderMap::new();
 
-    let host_value: HeaderValue = "tiktok-download-without-watermark.p.rapidapi.com"
-        .parse()
-        .map_err(|_| ApiError::WrongApiHost)?;
+    let host_value: HeaderValue =
+        "tiktok-download-without-watermark.p.rapidapi.com"
+            .parse()
+            .map_err(|_| ApiError::WrongApiHost)?;
     headers.insert("x-rapidapi-host", host_value);
 
-    let key_value: HeaderValue = tiktok_api_key.parse().map_err(|_| ApiError::WrongApiKey)?;
+    let key_value: HeaderValue =
+        tiktok_api_key.parse().map_err(|_| ApiError::WrongApiKey)?;
     headers.insert("x-rapidapi-key", key_value);
 
     let client = reqwest::Client::builder()
@@ -84,7 +90,7 @@ fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
         Value::String(value) => value.to_string(),
         _ => {
             return Err(UserInputError::NoResult);
-        }
+        },
     };
 
     // Supposing that if there "images" field -- then, it's photo-slide format.
