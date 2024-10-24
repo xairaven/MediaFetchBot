@@ -3,7 +3,7 @@ name = "media_fetch_bot"
 authors = ["Alex Kovalov <alexkovalevkpi@gmail.com>"]
 version = "0.2.2"
 edition = "2021"
-rust-version = "1.80"
+rust-version = "1.82"
 
 [dependencies]
 teloxide = { version =  "0.13.0", features = ["macros", "throttle"] }
