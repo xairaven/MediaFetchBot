@@ -8,16 +8,16 @@ rust-version = "1.82"
 [dependencies]
 teloxide = { version =  "0.13.0", features = ["macros", "throttle"] }
 
-tokio = { version =  "1.8", features = ["rt-multi-thread", "macros"] }
+tokio = { version =  "1.41.0", features = ["rt-multi-thread", "macros"] }
 dotenvy = "0.15.7"
 chrono = "0.4.38"
-fern = "0.6.2"
+fern = "0.7.0"
 log = "0.4.22"
-thiserror = "1.0.61"
-reqwest = { version = "0.12.5", features = ["json", "blocking"] }
-rust-i18n = "3.0.1"
-strum = "0.26"
-strum_macros = "0.26"
+thiserror = "1.0.65"
+reqwest = { version = "0.12.8", features = ["json", "blocking"] }
+rust-i18n = "3.1.2"
+strum = "0.26.3"
+strum_macros = "0.26.4"
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.118"
 url = "2.5.2"

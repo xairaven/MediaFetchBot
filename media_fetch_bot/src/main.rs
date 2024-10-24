@@ -62,7 +62,7 @@ async fn handle_message(
         None => {
             bot.send_message(
                 msg.chat.id,
-                t!(&UserInputError::EmptyMessage.to_string()),
+                t!(UserInputError::EmptyMessage.to_string()),
             )
             .await?;
             return Ok(());
@@ -96,7 +96,7 @@ async fn handle_message(
             _ => {
                 bot.send_message(
                     msg.chat.id,
-                    t!(&UserInputError::LinkTypeUndefined.to_string()),
+                    t!(UserInputError::LinkTypeUndefined.to_string()),
                 )
                 .await?;
                 log::info!(
@@ -115,12 +115,12 @@ async fn handle_command(
 ) -> ResponseResult<()> {
     match cmd {
         BotCommand::Help => {
-            bot.send_message(msg.chat.id, t!(&BotCommand::Help.to_string()))
+            bot.send_message(msg.chat.id, t!(BotCommand::Help.to_string()))
                 .parse_mode(ParseMode::Html)
                 .await?
         },
         BotCommand::Start => {
-            bot.send_message(msg.chat.id, t!(&BotCommand::Start.to_string()))
+            bot.send_message(msg.chat.id, t!(BotCommand::Start.to_string()))
                 .parse_mode(ParseMode::Html)
                 .await?
         },
@@ -161,7 +161,7 @@ fn form_error_text(err: ErrorType, chat_id: &ChatId, link: &str) -> String {
                 )
             );
 
-            format!("{}", t!(&err.to_string()))
+            format!("{}", t!(err.to_string()))
         },
         ErrorType::User(specific_err) => {
             log::warn!(
@@ -169,7 +169,7 @@ fn form_error_text(err: ErrorType, chat_id: &ChatId, link: &str) -> String {
                 format!("ChatID: {} -> ErrQuery: {}", chat_id, link)
             );
 
-            format!("{}", t!(&specific_err.to_string()))
+            format!("{}", t!(specific_err.to_string()))
         },
     }
 }
