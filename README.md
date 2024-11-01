@@ -28,11 +28,22 @@ Firstly, create a file named `.env` with this structure:
 BOT_TOKEN=...
 BOT_NAME=your_telegram_bot_username
 LOG_LEVEL=...
+WHITELIST=ON/OFF
 TIKTOK_API_KEY=...
 INSTAGRAM_API_KEY=...
 ```
 
 If you want to change the log level (default is `ERROR`), set the LOG_LEVEL variable to the desired level (`error`, `warn`, `info`, `debug`, `trace`, `off`).
+
+If you want to enable the whitelist, change the value of `WHITELIST` to `ON` instead of `OFF`.
+You also need to create a file named `whitelist.json` next to the `.env` file and fill it in the following format:
+
+```json
+[
+  123123,   // Some id
+  -1231231  // Another id for example
+]
+```
 
 Place it in the location specified in the instruction for the preferred method.
 

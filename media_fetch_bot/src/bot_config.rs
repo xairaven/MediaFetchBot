@@ -1,12 +1,16 @@
 use crate::errors::env::EnvError;
 use dotenvy::dotenv;
 use log::LevelFilter;
-use std::env;
+use std::{env, fs};
+
+const WHITELIST_FILE_NAME: &str = "whitelist.json";
 
 pub struct BotConfig {
     pub token: String,
     pub name: String,
     pub log_level: LevelFilter,
+    pub whitelist_enabled: bool,
+    pub whitelist: Vec<u64>,
     pub tiktok_api_key: Option<String>,
     pub instagram_api_key: Option<String>,
 }
@@ -38,6 +42,24 @@ impl BotConfig {
             _ => return Err(EnvError::LogLevelUndefined),
         };
 
+        // Loading option WHITELIST_ENABLED
+        let whitelist_enabled = env::var("WHITELIST")
+            .map_err(|_| EnvError::WhitelistEnabledNotLoaded)?;
+        let whitelist_enabled = match whitelist_enabled.trim() {
+            "ON" => true,
+            "OFF" => false,
+            _ => return Err(EnvError::WhitelistEnabledUndefined),
+        };
+
+        // Parsing whitelist, if enabled
+        let mut whitelist: Vec<u64> = vec![];
+        if whitelist_enabled {
+            let data = fs::read_to_string(WHITELIST_FILE_NAME)
+                .map_err(|_| EnvError::WhitelistFileOpeningFailed)?;
+            whitelist = serde_json::from_str(&data)
+                .map_err(|_| EnvError::WhitelistParseFailed)?;
+        }
+
         // Loading TikTok API Key
         let tiktok_api_key = env::var("TIKTOK_API_KEY");
         let tiktok_api_key = match tiktok_api_key {
@@ -57,6 +79,8 @@ impl BotConfig {
             token,
             name,
             log_level,
+            whitelist_enabled,
+            whitelist,
             tiktok_api_key,
             instagram_api_key,
         })

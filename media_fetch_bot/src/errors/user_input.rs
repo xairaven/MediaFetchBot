@@ -10,4 +10,7 @@ pub enum UserInputError {
 
     #[error("NoResult")]
     NoResult,
+
+    #[error("NotWhitelisted")]
+    NotWhitelisted,
 }

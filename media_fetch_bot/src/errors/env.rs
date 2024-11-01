@@ -11,6 +11,18 @@ pub enum EnvError {
     #[error("LogLevelUndefined")]
     LogLevelUndefined,
 
+    #[error("WhitelistEnabledNotLoaded")]
+    WhitelistEnabledNotLoaded,
+
+    #[error("WhitelistEnabledUndefined")]
+    WhitelistEnabledUndefined,
+
+    #[error("WhitelistFileOpeningFailed")]
+    WhitelistFileOpeningFailed,
+
+    #[error("WhitelistParseFailed")]
+    WhitelistParseFailed,
+
     #[error("NameNotLoaded")]
     NameNotLoaded,
 

@@ -19,6 +19,10 @@
   "LogLevelUndefined": "Undefined LOG_LEVEL. Possible levels: error, warn, info, debug, trace, off",
   "NameNotLoaded": "Something wrong with .env BOT_NAME. May be, there's no field with this name.",
   "TokenNotLoaded": "Something wrong with .env BOT_TOKEN. May be, there's no field with this name.",
+  "WhitelistEnabledNotLoaded": "Something wrong with .env WHITELIST. May be, there's no field with this name.",
+  "WhitelistEnabledUndefined": "Undefined WHITELIST option. Possible variants: ON or OFF.",
+  "WhitelistFileOpeningFailed": "Failed to open file whitelist.json",
+  "WhitelistParseFailed": "Whitelist.json parsing failed.",
 
   "EmptyMessage": "Empty message.",
   "LinkTypeUndefined": "Link type undefined.",
@@ -26,5 +30,6 @@
   "NoResult": "Unfortunately, there's no content at this link.",
 
   "BackendError": "<b>Error message:</b>\nSomething is wrong either with the bot or with API.\nPlease report this incident to the bot administrator.",
-  "UserError": "User Error. Something wrong with user input"
+  "UserError": "User Error. Something wrong with user input",
+  "NotWhitelisted": "You are not in the whitelist. If you believe this is a mistake, please contact the administrator."
 }
