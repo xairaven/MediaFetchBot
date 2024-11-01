@@ -13,11 +13,11 @@ dotenvy = "0.15.7"
 chrono = "0.4.38"
 fern = "0.7.0"
 log = "0.4.22"
-thiserror = "1.0.65"
-reqwest = { version = "0.12.8", features = ["json", "blocking"] }
+thiserror = "1.0.66"
+reqwest = { version = "0.12.9", features = ["json", "blocking"] }
 rust-i18n = "3.1.2"
 strum = "0.26.3"
 strum_macros = "0.26.4"
-serde = { version = "1.0.203", features = ["derive"] }
-serde_json = "1.0.118"
+serde = { version = "1.0.214", features = ["derive"] }
+serde_json = "1.0.132"
 url = "2.5.2"
