@@ -33,6 +33,8 @@ TIKTOK_API_KEY=...
 INSTAGRAM_API_KEY=...
 ```
 
+Place it in the location specified in the instruction for the preferred method.
+
 If you want to change the log level (default is `ERROR`), set the LOG_LEVEL variable to the desired level (`error`, `warn`, `info`, `debug`, `trace`, `off`).
 
 If you want to enable the whitelist, change the value of `WHITELIST` to `ON` instead of `OFF`.
@@ -44,8 +46,6 @@ You also need to create a file named `whitelist.json` next to the `.env` file an
   -1231231  // Another id for example
 ]
 ```
-
-Place it in the location specified in the instruction for the preferred method.
 
 Then clone the repo if you want to use method 2 or 3:
 
