@@ -29,14 +29,23 @@ BOT_TOKEN=...
 BOT_NAME=your_telegram_bot_username
 LOG_LEVEL=...
 WHITELIST=ON/OFF
+
+# Optional
+LOG_FORMAT="..."
+
+# Optional
 TIKTOK_API_KEY=...
+
+# Optional
 INSTAGRAM_API_KEY=...
 ```
 
 Place it in the location specified in the instruction for the preferred method.
 
+### Log Level:
 If you want to change the log level (default is `ERROR`), set the LOG_LEVEL variable to the desired level (`error`, `warn`, `info`, `debug`, `trace`, `off`).
 
+### Whitelist:
 If you want to enable the whitelist, change the value of `WHITELIST` to `ON` instead of `OFF`.
 You also need to create a file named `whitelist.json` next to the `.env` file and fill it in the following format:
 
@@ -46,6 +55,26 @@ You also need to create a file named `whitelist.json` next to the `.env` file an
   -1231231  // Another id for example
 ]
 ```
+
+### Log Format:
+You can change the log format if desired.
+
+Parameters:
+- `%MESSAGE` - The message.
+- `%LEVEL` - The verbosity level of the message.
+- `%TARGET` - The name of the target of the directive.
+- `%Y` - Year.
+- `%m` - Month.
+- `%D` - Day.
+- `%H` - Hours.
+- `%M` - Minutes.
+- `%S` - Seconds.
+
+For example, the default format is `[%Y-%m-%D %H-%M-%S %LEVEL %TARGET] %MESSAGE`.
+
+Usage example: `[2024-11-02 00-03-24 INFO media_fetch_bot] Started bot`.
+
+---
 
 Then clone the repo if you want to use method 2 or 3:
 
