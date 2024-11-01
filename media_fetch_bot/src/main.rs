@@ -2,7 +2,6 @@ use crate::bot_commands::BotCommand;
 use crate::bot_config::BotConfig;
 use crate::errors::error_type::ErrorType;
 use crate::errors::user_input::UserInputError;
-use crate::link_type::LinkType;
 use rust_i18n::t;
 use std::process;
 use std::sync::Arc;
@@ -14,7 +13,6 @@ use teloxide::{prelude::*, utils::command::BotCommands};
 mod bot_commands;
 mod bot_config;
 mod errors;
-mod link_type;
 mod logger;
 
 mod instagram;
@@ -94,38 +92,24 @@ async fn handle_message(
         return Ok(());
     }
 
-    match text {
-        tiktok_link if tiktok_link.contains(&LinkType::TikTok.to_string()) => {
-            handle_tiktok_link(
-                tiktok_link,
-                bot_config.tiktok_api_key.clone(),
-                &bot,
-                &msg,
-            )
-            .await?
-        },
-        instagram_link
-            if instagram_link.contains(&LinkType::Instagram.to_string()) =>
-        {
-            handle_instagram_link(
-                instagram_link,
-                bot_config.instagram_api_key.clone(),
-                &bot,
-                &msg,
-            )
-            .await?
-        },
-        _ => {
-            bot.send_message(
-                msg.chat.id,
-                t!(UserInputError::LinkTypeUndefined.to_string()),
-            )
-            .await?;
-            log::info!(
-                "{}",
-                format!("ChatID: {} -> Undefined: {}", msg.chat.id, text)
-            );
-        },
+    let api_instances = rapid_api::api_factory(&bot_config);
+    let mut link_defined = false;
+    for instance in &api_instances {
+        if text.contains(&instance.link_base()) {
+            instance.handle_link(text, &bot, &msg).await?;
+            link_defined = true;
+        }
+    }
+    if !link_defined {
+        bot.send_message(
+            msg.chat.id,
+            t!(UserInputError::LinkTypeUndefined.to_string()),
+        )
+        .await?;
+        log::info!(
+            "{}",
+            format!("ChatID: {} -> Undefined: {}", msg.chat.id, text)
+        );
     }
 
     Ok(())
@@ -146,27 +130,6 @@ async fn handle_command(
                 .await?
         },
     };
-
-    Ok(())
-}
-
-async fn handle_tiktok_link(
-    link: &str, api_key: Option<String>, bot: &Throttle<Bot>, msg: &Message,
-) -> ResponseResult<()> {
-    let results = tiktok::handler::get_results(api_key, link.to_string()).await;
-
-    rapid_api::send_results(results, bot, msg, link).await?;
-
-    Ok(())
-}
-
-async fn handle_instagram_link(
-    link: &str, api_key: Option<String>, bot: &Throttle<Bot>, msg: &Message,
-) -> ResponseResult<()> {
-    let results =
-        instagram::handler::get_results(api_key, link.to_string()).await;
-
-    rapid_api::send_results(results, bot, msg, link).await?;
 
     Ok(())
 }

@@ -1,6 +1,10 @@
+use crate::bot_config::BotConfig;
 use crate::errors::error_type::ErrorType;
 use crate::form_error_text;
+use crate::instagram::InstagramInstance;
 use crate::rapid_api::media_format::MediaFormat;
+use crate::tiktok::TikTokInstance;
+use async_trait::async_trait;
 use std::collections::HashMap;
 use teloxide::adaptors::Throttle;
 use teloxide::payloads::SendMessageSetters;
@@ -11,8 +15,47 @@ use teloxide::Bot;
 pub mod media_format;
 pub mod raw_media;
 
-type RapidApiResults =
-    Result<(String, HashMap<MediaFormat, Vec<InputMedia>>), ErrorType>;
+pub type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
+pub type RapidApiResults = Result<(String, InputMediaMap), ErrorType>;
+#[async_trait]
+pub trait ApiHandler {
+    fn link_base(&self) -> String;
+
+    async fn handle_link(
+        &self, link: &str, bot: &Throttle<Bot>, msg: &Message,
+    ) -> ResponseResult<()> {
+        let results = self.get_results(link.to_string()).await;
+        self.send_results(results, bot, msg, link).await?;
+
+        Ok(())
+    }
+    async fn get_results(&self, link: String) -> RapidApiResults;
+    async fn send_results(
+        &self, results: RapidApiResults, bot: &Throttle<Bot>, msg: &Message,
+        link: &str,
+    ) -> ResponseResult<()> {
+        Ok(send_results(results, bot, msg, link).await?)
+    }
+}
+
+pub fn api_factory(
+    config: &BotConfig,
+) -> Vec<Box<dyn ApiHandler + Sync + Send>> {
+    let mut structs: Vec<Box<dyn ApiHandler + Sync + Send>> = vec![];
+
+    if let Some(api_key) = &config.tiktok_api_key {
+        let instance = TikTokInstance::new(api_key.clone());
+        structs.push(Box::new(instance));
+    }
+
+    if let Some(api_key) = &config.instagram_api_key {
+        let instance = InstagramInstance::new(api_key.clone());
+        structs.push(Box::new(instance));
+    }
+
+    structs
+}
+
 pub async fn send_results(
     results: RapidApiResults, bot: &Throttle<Bot>, msg: &Message, link: &str,
 ) -> ResponseResult<()> {

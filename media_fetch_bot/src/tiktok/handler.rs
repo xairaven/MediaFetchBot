@@ -8,21 +8,14 @@ use teloxide::types::{
 use url::Url;
 
 use crate::errors::api::ApiError;
-use crate::errors::error_type::ErrorType;
 use crate::errors::user_input::UserInputError;
 use crate::rapid_api::media_format::MediaFormat;
 use crate::rapid_api::raw_media::RawMedia;
+use crate::rapid_api::{InputMediaMap, RapidApiResults};
 use crate::utils::response_processing;
 
-type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
-
-pub async fn get_results(
-    tiktok_api_key: Option<String>, link: String,
-) -> Result<(String, InputMediaMap), ErrorType> {
-    let tiktok_api_key: String =
-        tiktok_api_key.ok_or(ApiError::ApiKeyTiktokMissing)?;
-
-    let response = get_response(&tiktok_api_key, link).await?;
+pub async fn get_results(api_key: &str, link: String) -> RapidApiResults {
+    let response = get_response(api_key, link).await?;
     let json = response_processing::to_json(response)?;
 
     let (post_title, raw_media_documents) = parse_json(json)?;

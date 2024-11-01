@@ -3,8 +3,6 @@
   "Start": "<b>Welcome to the Media Downloader Bot!</b>\n\n<b>Commands:</b>\n- /help: Display this help message.\n\n<b>How to use:</b>\nTo download media from TikTok or Instagram, simply send a link directly to the bot.\nThe bot will process the link and send the media file back to you.\n\n<b>Additional Notes:</b>\nEnsure that content is directly accessible (not private or restricted).\n\n<b>Supported formats:</b>\n- TikTok Videos;\n- TikTok Photo Slides;\n- Instagram Reels;\n- Instagram Stories;\n- Instagram Photos;\n- Instagram Slides.",
   "Help": "<b>Commands:</b>\n- /help: Display this help message.\n\n<b>How to use:</b>\nTo download media from TikTok or Instagram, simply send a link directly to the bot.\nThe bot will process the link and send the media file back to you.\n\n<b>Additional Notes:</b>\nEnsure that content is directly accessible (not private or restricted).\n\n<b>Supported formats:</b>\n- TikTok Videos;\n- TikTok Photo Slides;\n- Instagram Reels;\n- Instagram Stories;\n- Instagram Photos;\n- Instagram Slides.",
 
-  "ApiKeyTiktokMissing": "Tiktok API Key missing. Module is not working.",
-  "ApiKeyInstagramMissing": "Instagram API Key missing. Module is not working.",
   "FailedGetResponse": "Failed to get a response from API.",
   "FailedParseResponse": "Failed to parse response.",
   "FailedParseUrl": "Failed to parse final url.",

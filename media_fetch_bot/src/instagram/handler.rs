@@ -1,9 +1,9 @@
 use crate::errors::api::ApiError;
-use crate::errors::error_type::ErrorType;
 use crate::instagram::content_type::ContentType;
 use crate::instagram::{post, story};
 use crate::rapid_api::media_format::MediaFormat;
 use crate::rapid_api::raw_media::RawMedia;
+use crate::rapid_api::{InputMediaMap, RapidApiResults};
 use crate::utils::response_processing;
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::Client;
@@ -13,15 +13,9 @@ use teloxide::types::{
 };
 use url::Url;
 
-type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
-
-pub async fn get_results(
-    api_key: Option<String>, link: String,
-) -> Result<(String, InputMediaMap), ErrorType> {
-    let api_key: String = api_key.ok_or(ApiError::ApiKeyInstagramMissing)?;
-
+pub async fn get_results(api_key: &str, link: String) -> RapidApiResults {
     let content_type = ContentType::choose(&link);
-    let response = get_response(&api_key, &content_type, link).await?;
+    let response = get_response(api_key, &content_type, link).await?;
     let json = response_processing::to_json(response)?;
 
     let (caption, raw_medias) = match content_type {
