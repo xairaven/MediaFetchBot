@@ -9,6 +9,7 @@ pub struct BotConfig {
     pub token: String,
     pub name: String,
     pub log_level: LevelFilter,
+    pub log_format: String,
     pub whitelist_enabled: bool,
     pub whitelist: Vec<u64>,
     pub tiktok_api_key: Option<String>,
@@ -40,6 +41,13 @@ impl BotConfig {
             "debug" => LevelFilter::Debug,
             "trace" => LevelFilter::Trace,
             _ => return Err(EnvError::LogLevelUndefined),
+        };
+
+        // Loading option LOG_FORMAT
+        let log_format = env::var("LOG_FORMAT");
+        let log_format = match log_format {
+            Ok(value) if !value.trim().is_empty() => value,
+            _ => "[%Y-%m-%D %H-%M-%S %LEVEL %TARGET] %MESSAGE".to_string(),
         };
 
         // Loading option WHITELIST_ENABLED
@@ -79,6 +87,7 @@ impl BotConfig {
             token,
             name,
             log_level,
+            log_format,
             whitelist_enabled,
             whitelist,
             tiktok_api_key,

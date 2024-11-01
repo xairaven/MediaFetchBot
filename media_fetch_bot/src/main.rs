@@ -33,10 +33,11 @@ async fn main() {
         process::exit(1);
     }));
 
-    logger::init(&bot_config.log_level).unwrap_or_else(|err| {
-        log::error!("Error: {err}");
-        process::exit(1);
-    });
+    logger::init(&bot_config.log_level, bot_config.log_format.clone())
+        .unwrap_or_else(|err| {
+            log::error!("Error: {err}");
+            process::exit(1);
+        });
 
     let bot = Bot::new(&bot_config.token).throttle(Limits::default());
 
