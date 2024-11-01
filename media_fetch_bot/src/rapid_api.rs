@@ -1,10 +1,11 @@
 use crate::bot_config::BotConfig;
 use crate::errors::error_type::ErrorType;
-use crate::form_error_text;
 use crate::instagram::InstagramInstance;
+use crate::logger;
 use crate::rapid_api::media_format::MediaFormat;
 use crate::tiktok::TikTokInstance;
 use async_trait::async_trait;
+use rust_i18n::t;
 use std::collections::HashMap;
 use teloxide::adaptors::Throttle;
 use teloxide::payloads::SendMessageSetters;
@@ -78,10 +79,43 @@ pub async fn send_results(
                 bot.send_message(msg.chat.id, title).await?;
             }
 
-            log::info!("{}", format!("ChatID: {} -> {}", msg.chat.id, link));
+            log::info!(
+                "{}",
+                format!(
+                    "User: {} -> {}",
+                    logger::get_sender_identifier(msg),
+                    link
+                )
+            );
         },
         Err(err) => {
-            let error_text = form_error_text(err, &msg.chat.id, link);
+            let error_text = match err {
+                ErrorType::Backend(ref specific_err) => {
+                    log::error!(
+                        "{}",
+                        format!(
+                            "User: {}. {} -> ErrQuery: {}",
+                            specific_err,
+                            logger::get_sender_identifier(msg),
+                            link,
+                        )
+                    );
+
+                    format!("{}", t!(err.to_string()))
+                },
+                ErrorType::User(specific_err) => {
+                    log::warn!(
+                        "{}",
+                        format!(
+                            "User: {} -> ErrQuery: {}",
+                            logger::get_sender_identifier(msg),
+                            link
+                        )
+                    );
+
+                    format!("{}", t!(specific_err.to_string()))
+                },
+            };
 
             bot.send_message(msg.chat.id, error_text)
                 .parse_mode(ParseMode::Html)

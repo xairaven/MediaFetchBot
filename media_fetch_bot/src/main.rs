@@ -1,6 +1,5 @@
 use crate::bot_commands::BotCommand;
 use crate::bot_config::BotConfig;
-use crate::errors::error_type::ErrorType;
 use crate::errors::user_input::UserInputError;
 use rust_i18n::t;
 use std::process;
@@ -79,7 +78,11 @@ async fn handle_message(
             .await?;
             log::info!(
                 "{}",
-                format!("ChatID: {} -> NotWhitelisted: {}", msg.chat.id, text)
+                format!(
+                    "User: {} -> NotWhitelisted: {}",
+                    logger::get_sender_identifier(&msg),
+                    text
+                )
             );
 
             return Ok(());
@@ -108,7 +111,11 @@ async fn handle_message(
         .await?;
         log::info!(
             "{}",
-            format!("ChatID: {} -> Undefined: {}", msg.chat.id, text)
+            format!(
+                "{} -> Undefined: {}",
+                logger::get_sender_identifier(&msg),
+                text
+            )
         );
     }
 
@@ -132,28 +139,4 @@ async fn handle_command(
     };
 
     Ok(())
-}
-
-fn form_error_text(err: ErrorType, chat_id: &ChatId, link: &str) -> String {
-    match err {
-        ErrorType::Backend(ref specific_err) => {
-            log::error!(
-                "{}",
-                format!(
-                    "{}. ChatID: {} -> ErrQuery: {}",
-                    specific_err, chat_id, link
-                )
-            );
-
-            format!("{}", t!(err.to_string()))
-        },
-        ErrorType::User(specific_err) => {
-            log::warn!(
-                "{}",
-                format!("ChatID: {} -> ErrQuery: {}", chat_id, link)
-            );
-
-            format!("{}", t!(specific_err.to_string()))
-        },
-    }
 }

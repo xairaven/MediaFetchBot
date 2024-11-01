@@ -1,5 +1,6 @@
 use chrono::Local;
 use log::{LevelFilter, SetLoggerError};
+use teloxide::types::Message;
 
 pub fn init(log_level: &LevelFilter) -> Result<(), SetLoggerError> {
     fern::Dispatch::new()
@@ -19,4 +20,20 @@ pub fn init(log_level: &LevelFilter) -> Result<(), SetLoggerError> {
         .level_for("teloxide::error_handlers", LevelFilter::Debug)
         .chain(std::io::stdout())
         .apply()
+}
+
+pub fn get_sender_identifier(msg: &Message) -> String {
+    let identifier: String;
+
+    if let Some(user) = &msg.from {
+        if let Some(username) = &user.username {
+            identifier = format!("@{}", username);
+        } else {
+            identifier = format!("{} ({})", user.full_name(), msg.chat.id);
+        }
+    } else {
+        identifier = format!("{}", msg.chat.id);
+    }
+
+    identifier
 }
