@@ -1,11 +1,11 @@
-FROM rust:1.79.0 AS builder
+FROM rust:1.82.0 AS builder
 
 # Copying code + .env
 WORKDIR /usr/src/app
 COPY src ./src
 COPY locales ./locales
 COPY .env ./
-COPY Cargo.lock ./
+COPY whitelist.json* ./
 COPY Cargo.toml ./
 
 # BUILD
@@ -33,6 +33,7 @@ ENV APP_NAME_ENV=media_fetch_bot
 # Copying built executable from builder to runner
 COPY --from=builder /usr/src/app/target/release/${APP_NAME_ARG} /usr/local/bin/
 COPY --from=builder /usr/src/app/.env /usr/local/bin/
+COPY --from=builder /usr/src/app/whitelist.json* /usr/local/bin/
 
 # Workdir on runner
 WORKDIR /usr/local/bin
