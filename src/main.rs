@@ -113,7 +113,7 @@ async fn handle_message(
         log::info!(
             "{}",
             format!(
-                "{} -> Undefined: {}",
+                "User: {} -> Undefined: {}",
                 logger::get_sender_identifier(&msg),
                 text
             )
