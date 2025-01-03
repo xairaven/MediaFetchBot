@@ -1,4 +1,5 @@
-use crate::rapid_api::{ApiHandler, RapidApiResults};
+use crate::rapid_api::manager::ApiInstance;
+use crate::rapid_api::RapidApiResults;
 use async_trait::async_trait;
 
 pub mod handler;
@@ -18,7 +19,7 @@ impl TikTokApi {
 }
 
 #[async_trait]
-impl ApiHandler for TikTokApi {
+impl ApiInstance for TikTokApi {
     fn base_url(&self) -> String {
         self.base_url.clone()
     }
