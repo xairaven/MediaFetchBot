@@ -1,9 +1,9 @@
 use crate::bot::config::BotConfig;
 use crate::errors::error_type::ErrorType;
-use crate::instagram::InstagramInstance;
+use crate::instagram::InstagramApi;
 use crate::logger;
 use crate::rapid_api::media_format::MediaFormat;
-use crate::tiktok::TikTokInstance;
+use crate::tiktok::TikTokApi;
 use async_trait::async_trait;
 use rust_i18n::t;
 use std::collections::HashMap;
@@ -20,7 +20,7 @@ pub type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
 pub type RapidApiResults = Result<(String, InputMediaMap), ErrorType>;
 #[async_trait]
 pub trait ApiHandler {
-    fn link_base(&self) -> String;
+    fn base_url(&self) -> String;
 
     async fn handle_link(
         &self, link: &str, bot: &Throttle<Bot>, msg: &Message,
@@ -42,13 +42,11 @@ pub fn api_factory(config: &BotConfig) -> Vec<Box<dyn ApiHandler + Sync + Send>>
     let mut structs: Vec<Box<dyn ApiHandler + Sync + Send>> = vec![];
 
     if let Some(api_key) = &config.tiktok_api_key {
-        let instance = TikTokInstance::new(api_key.clone());
-        structs.push(Box::new(instance));
+        structs.push(Box::new(TikTokApi::new(api_key.clone())));
     }
 
     if let Some(api_key) = &config.instagram_api_key {
-        let instance = InstagramInstance::new(api_key.clone());
-        structs.push(Box::new(instance));
+        structs.push(Box::new(InstagramApi::new(api_key.clone())));
     }
 
     structs

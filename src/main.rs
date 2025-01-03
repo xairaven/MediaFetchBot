@@ -70,7 +70,7 @@ async fn handle_message(
     let api_instances = rapid_api::api_factory(&bot_config);
     let instance = api_instances
         .iter()
-        .find(|instance| text.contains(&instance.link_base()));
+        .find(|instance| text.contains(&instance.base_url()));
     match instance {
         Some(instance) => {
             instance.handle_link(text, &bot, &msg).await?;
@@ -99,9 +99,8 @@ mod bot {
     pub mod config;
 }
 mod errors;
-mod logger;
-
 mod instagram;
+mod logger;
 mod rapid_api;
 mod tiktok;
 mod utils;

@@ -3,24 +3,24 @@ use async_trait::async_trait;
 
 pub mod handler;
 
-pub struct TikTokInstance {
+pub struct TikTokApi {
     api_key: String,
-    link_base: String,
+    base_url: String,
 }
 
-impl TikTokInstance {
+impl TikTokApi {
     pub fn new(api_key: String) -> Self {
         Self {
             api_key,
-            link_base: String::from("tiktok.com"),
+            base_url: String::from("tiktok.com"),
         }
     }
 }
 
 #[async_trait]
-impl ApiHandler for TikTokInstance {
-    fn link_base(&self) -> String {
-        self.link_base.clone()
+impl ApiHandler for TikTokApi {
+    fn base_url(&self) -> String {
+        self.base_url.clone()
     }
 
     async fn get_results(&self, link: String) -> RapidApiResults {

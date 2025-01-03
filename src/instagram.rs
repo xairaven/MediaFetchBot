@@ -6,24 +6,24 @@ mod handler;
 mod post;
 mod story;
 
-pub struct InstagramInstance {
+pub struct InstagramApi {
     api_key: String,
-    link_base: String,
+    base_url: String,
 }
 
-impl InstagramInstance {
+impl InstagramApi {
     pub fn new(api_key: String) -> Self {
         Self {
             api_key,
-            link_base: String::from("instagram.com"),
+            base_url: String::from("instagram.com"),
         }
     }
 }
 
 #[async_trait]
-impl ApiHandler for InstagramInstance {
-    fn link_base(&self) -> String {
-        self.link_base.clone()
+impl ApiHandler for InstagramApi {
+    fn base_url(&self) -> String {
+        self.base_url.clone()
     }
 
     async fn get_results(&self, link: String) -> RapidApiResults {
