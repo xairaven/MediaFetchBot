@@ -1,4 +1,4 @@
-use crate::bot_config::BotConfig;
+use crate::bot::config::BotConfig;
 use crate::errors::error_type::ErrorType;
 use crate::instagram::InstagramInstance;
 use crate::logger;

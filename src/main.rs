@@ -1,5 +1,5 @@
-use crate::bot_commands::BotCommand;
-use crate::bot_config::BotConfig;
+use crate::bot::commands::BotCommand;
+use crate::bot::config::BotConfig;
 use crate::errors::user_input::UserInputError;
 use rust_i18n::t;
 use std::process;
@@ -7,17 +7,6 @@ use std::sync::Arc;
 use teloxide::adaptors::throttle::Limits;
 use teloxide::adaptors::Throttle;
 use teloxide::{prelude::*, utils::command::BotCommands};
-
-mod bot_commands;
-mod bot_config;
-mod errors;
-mod logger;
-
-mod instagram;
-mod rapid_api;
-mod tiktok;
-mod utils;
-mod whitelist;
 
 // Defining folder with locales. Path: media_fetch_bot/locales
 rust_i18n::i18n!("locales");
@@ -116,3 +105,16 @@ async fn handle_message(
 
     Ok(())
 }
+
+mod bot {
+    pub mod commands;
+    pub mod config;
+}
+mod errors;
+mod logger;
+
+mod instagram;
+mod rapid_api;
+mod tiktok;
+mod utils;
+mod whitelist;
