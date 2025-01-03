@@ -1,8 +1,7 @@
 use crate::errors::api::ApiError;
 use crate::instagram::content_type::ContentType;
 use crate::instagram::{post, story};
-use crate::rapid_api::media_format::MediaFormat;
-use crate::rapid_api::raw_media::RawMedia;
+use crate::rapid_api::media::{MediaFormat, RawMedia};
 use crate::rapid_api::{InputMediaMap, RapidApiResults};
 use crate::utils::response_processing;
 use reqwest::header::{HeaderMap, HeaderValue};

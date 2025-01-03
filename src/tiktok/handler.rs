@@ -9,8 +9,7 @@ use url::Url;
 
 use crate::errors::api::ApiError;
 use crate::errors::user_input::UserInputError;
-use crate::rapid_api::media_format::MediaFormat;
-use crate::rapid_api::raw_media::RawMedia;
+use crate::rapid_api::media::{MediaFormat, RawMedia};
 use crate::rapid_api::{InputMediaMap, RapidApiResults};
 use crate::utils::response_processing;
 

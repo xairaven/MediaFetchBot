@@ -2,14 +2,13 @@ use crate::bot::config::BotConfig;
 use crate::errors::error_type::ErrorType;
 use crate::instagram::InstagramApi;
 use crate::rapid_api::instance::ApiInstance;
-use crate::rapid_api::media_format::MediaFormat;
+use crate::rapid_api::media::MediaFormat;
 use crate::tiktok::TikTokApi;
 use std::collections::HashMap;
 use teloxide::types::InputMedia;
 
 pub mod instance;
-pub mod media_format;
-pub mod raw_media;
+pub mod media;
 
 pub type InputMediaMap = HashMap<MediaFormat, Vec<InputMedia>>;
 pub type RapidApiResults = Result<(String, InputMediaMap), ErrorType>;
