@@ -1,13 +1,13 @@
 use crate::bot::config::BotConfig;
 use crate::errors::error_type::ErrorType;
 use crate::instagram::InstagramApi;
-use crate::rapid_api::manager::ApiInstance;
+use crate::rapid_api::instance::ApiInstance;
 use crate::rapid_api::media_format::MediaFormat;
 use crate::tiktok::TikTokApi;
 use std::collections::HashMap;
 use teloxide::types::InputMedia;
 
-pub mod manager;
+pub mod instance;
 pub mod media_format;
 pub mod raw_media;
 

@@ -1,4 +1,4 @@
-use crate::rapid_api::manager::ApiInstance;
+use crate::rapid_api::instance::ApiInstance;
 use crate::rapid_api::RapidApiResults;
 use async_trait::async_trait;
 
