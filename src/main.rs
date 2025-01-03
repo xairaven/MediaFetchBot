@@ -64,32 +64,31 @@ async fn handle_message(
 
     // Check if the message is a command
     if let Ok(command) = BotCommand::parse(text, &bot_config.name) {
-        command.handle(bot, msg).await?;
-        return Ok(());
+        return command.handle(bot, msg).await;
     }
 
     let api_instances = rapid_api::api_factory(&bot_config);
-    let mut link_defined = false;
-    for instance in &api_instances {
-        if text.contains(&instance.link_base()) {
+    let instance = api_instances
+        .iter()
+        .find(|instance| text.contains(&instance.link_base()));
+    match instance {
+        Some(instance) => {
             instance.handle_link(text, &bot, &msg).await?;
-            link_defined = true;
-        }
-    }
-    if !link_defined {
-        bot.send_message(
-            msg.chat.id,
-            t!(UserInputError::LinkTypeUndefined.to_string()),
-        )
-        .await?;
-        log::info!(
-            "{}",
-            format!(
+        },
+        None => {
+            bot.send_message(
+                msg.chat.id,
+                t!(UserInputError::LinkTypeUndefined.to_string()),
+            )
+            .await?;
+
+            let log_message = format!(
                 "User: {} -> Undefined: {}",
                 logger::get_sender_identifier(&msg),
                 text
-            )
-        );
+            );
+            log::info!("{log_message}");
+        },
     }
 
     Ok(())
