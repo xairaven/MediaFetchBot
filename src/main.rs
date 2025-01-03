@@ -54,21 +54,10 @@ async fn handle_message(
 
     // Check if user whitelisted, if whitelist is enabled.
     if bot_config.whitelist_enabled {
-        let user_whitelisted =
-            whitelist::is_user_whitelisted(&msg.from, &bot_config.whitelist);
+        let whitelisted =
+            whitelist::validate_user_access(&bot, &msg, &bot_config.whitelist).await;
 
-        if !user_whitelisted {
-            bot.send_message(msg.chat.id, t!(UserInputError::NotWhitelisted.to_string()))
-                .await?;
-            log::info!(
-                "{}",
-                format!(
-                    "User: {} -> NotWhitelisted: {}",
-                    logger::get_sender_identifier(&msg),
-                    text
-                )
-            );
-
+        if !whitelisted {
             return Ok(());
         }
     }
