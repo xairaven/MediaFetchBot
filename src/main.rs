@@ -6,7 +6,6 @@ use std::process;
 use std::sync::Arc;
 use teloxide::adaptors::throttle::Limits;
 use teloxide::adaptors::Throttle;
-use teloxide::types::ParseMode;
 use teloxide::{prelude::*, utils::command::BotCommands};
 
 mod bot_commands;
@@ -33,11 +32,12 @@ async fn main() {
         process::exit(1);
     }));
 
-    logger::init(&bot_config.log_level, bot_config.log_format.clone())
-        .unwrap_or_else(|err| {
-            log::error!("Error: {err}");
+    logger::init(&bot_config.log_level, bot_config.log_format.clone()).unwrap_or_else(
+        |err| {
+            eprintln!("Error: {err}");
             process::exit(1);
-        });
+        },
+    );
 
     let bot = Bot::new(&bot_config.token).throttle(Limits::default());
 
@@ -56,11 +56,8 @@ async fn handle_message(
 ) -> ResponseResult<()> {
     let text = match msg.text() {
         None => {
-            bot.send_message(
-                msg.chat.id,
-                t!(UserInputError::EmptyMessage.to_string()),
-            )
-            .await?;
+            bot.send_message(msg.chat.id, t!(UserInputError::EmptyMessage.to_string()))
+                .await?;
             return Ok(());
         },
         Some(value) => value,
@@ -72,11 +69,8 @@ async fn handle_message(
             whitelist::is_user_whitelisted(&msg.from, &bot_config.whitelist);
 
         if !user_whitelisted {
-            bot.send_message(
-                msg.chat.id,
-                t!(UserInputError::NotWhitelisted.to_string()),
-            )
-            .await?;
+            bot.send_message(msg.chat.id, t!(UserInputError::NotWhitelisted.to_string()))
+                .await?;
             log::info!(
                 "{}",
                 format!(
@@ -92,7 +86,7 @@ async fn handle_message(
 
     // Check if the message is a command
     if let Ok(command) = BotCommand::parse(text, &bot_config.name) {
-        handle_command(bot, msg, command).await?;
+        command.handle(bot, msg).await?;
         return Ok(());
     }
 
@@ -119,25 +113,6 @@ async fn handle_message(
             )
         );
     }
-
-    Ok(())
-}
-
-async fn handle_command(
-    bot: Throttle<Bot>, msg: Message, cmd: BotCommand,
-) -> ResponseResult<()> {
-    match cmd {
-        BotCommand::Help => {
-            bot.send_message(msg.chat.id, t!(BotCommand::Help.to_string()))
-                .parse_mode(ParseMode::Html)
-                .await?
-        },
-        BotCommand::Start => {
-            bot.send_message(msg.chat.id, t!(BotCommand::Start.to_string()))
-                .parse_mode(ParseMode::Html)
-                .await?
-        },
-    };
 
     Ok(())
 }

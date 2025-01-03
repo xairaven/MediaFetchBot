@@ -8,9 +8,7 @@ use crate::utils::response_processing;
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::Client;
 use std::collections::HashMap;
-use teloxide::types::{
-    InputFile, InputMedia, InputMediaPhoto, InputMediaVideo,
-};
+use teloxide::types::{InputFile, InputMedia, InputMediaPhoto, InputMediaVideo};
 use url::Url;
 
 pub async fn get_results(api_key: &str, link: String) -> RapidApiResults {
@@ -34,14 +32,12 @@ async fn get_response(
     let mut headers = HeaderMap::new();
     headers.insert("Content-Type", "application/json".parse().unwrap());
 
-    let host_value: HeaderValue =
-        "instagram-bulk-scraper-latest.p.rapidapi.com"
-            .parse()
-            .map_err(|_| ApiError::WrongApiHost)?;
+    let host_value: HeaderValue = "instagram-bulk-scraper-latest.p.rapidapi.com"
+        .parse()
+        .map_err(|_| ApiError::WrongApiHost)?;
     headers.insert("x-rapidapi-host", host_value);
 
-    let key_value: HeaderValue =
-        api_key.parse().map_err(|_| ApiError::WrongApiKey)?;
+    let key_value: HeaderValue = api_key.parse().map_err(|_| ApiError::WrongApiKey)?;
     headers.insert("x-rapidapi-key", key_value);
 
     let client = Client::builder()
@@ -79,9 +75,7 @@ async fn get_response(
     Ok(response_text)
 }
 
-fn convert_raw_to_input_media(
-    vec: Vec<RawMedia>,
-) -> Result<InputMediaMap, ApiError> {
+fn convert_raw_to_input_media(vec: Vec<RawMedia>) -> Result<InputMediaMap, ApiError> {
     let mut files: InputMediaMap = HashMap::new();
 
     for raw_media in vec {

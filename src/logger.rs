@@ -3,9 +3,7 @@ use log::{LevelFilter, Record, SetLoggerError};
 use std::fmt::Arguments;
 use teloxide::types::Message;
 
-pub fn init(
-    log_level: &LevelFilter, format: String,
-) -> Result<(), SetLoggerError> {
+pub fn init(log_level: &LevelFilter, format: String) -> Result<(), SetLoggerError> {
     fern::Dispatch::new()
         .format(move |out, message, record| {
             let formatted = parse_log_format(format.clone(), message, record);
@@ -23,9 +21,7 @@ pub fn init(
         .apply()
 }
 
-pub fn parse_log_format(
-    format: String, message: &Arguments, record: &Record,
-) -> String {
+pub fn parse_log_format(format: String, message: &Arguments, record: &Record) -> String {
     let mut log = format;
 
     // Message

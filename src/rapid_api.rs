@@ -32,16 +32,13 @@ pub trait ApiHandler {
     }
     async fn get_results(&self, link: String) -> RapidApiResults;
     async fn send_results(
-        &self, results: RapidApiResults, bot: &Throttle<Bot>, msg: &Message,
-        link: &str,
+        &self, results: RapidApiResults, bot: &Throttle<Bot>, msg: &Message, link: &str,
     ) -> ResponseResult<()> {
         Ok(send_results(results, bot, msg, link).await?)
     }
 }
 
-pub fn api_factory(
-    config: &BotConfig,
-) -> Vec<Box<dyn ApiHandler + Sync + Send>> {
+pub fn api_factory(config: &BotConfig) -> Vec<Box<dyn ApiHandler + Sync + Send>> {
     let mut structs: Vec<Box<dyn ApiHandler + Sync + Send>> = vec![];
 
     if let Some(api_key) = &config.tiktok_api_key {
@@ -81,11 +78,7 @@ pub async fn send_results(
 
             log::info!(
                 "{}",
-                format!(
-                    "User: {} -> {}",
-                    logger::get_sender_identifier(msg),
-                    link
-                )
+                format!("User: {} -> {}", logger::get_sender_identifier(msg), link)
             );
         },
         Err(err) => {

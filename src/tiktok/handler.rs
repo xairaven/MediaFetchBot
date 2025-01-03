@@ -25,15 +25,12 @@ pub async fn get_results(api_key: &str, link: String) -> RapidApiResults {
     Ok((post_title, input_media_map))
 }
 
-async fn get_response(
-    tiktok_api_key: &str, link: String,
-) -> Result<String, ApiError> {
+async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, ApiError> {
     let mut headers = header::HeaderMap::new();
 
-    let host_value: HeaderValue =
-        "tiktok-download-without-watermark.p.rapidapi.com"
-            .parse()
-            .map_err(|_| ApiError::WrongApiHost)?;
+    let host_value: HeaderValue = "tiktok-download-without-watermark.p.rapidapi.com"
+        .parse()
+        .map_err(|_| ApiError::WrongApiHost)?;
     headers.insert("x-rapidapi-host", host_value);
 
     let key_value: HeaderValue =

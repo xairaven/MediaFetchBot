@@ -2,9 +2,7 @@ use crate::errors::user_input::UserInputError;
 use crate::rapid_api::raw_media::RawMedia;
 use serde_json::Value;
 
-pub fn parse_json(
-    json: Value,
-) -> Result<(String, Vec<RawMedia>), UserInputError> {
+pub fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
     let mut results: Vec<RawMedia> = vec![];
 
     let data = &json["data"];
@@ -14,8 +12,7 @@ pub fn parse_json(
         caption = value.to_string();
     }
 
-    let main_media =
-        form_raw_media(&data["main_media_type"], &data["main_media_hd"])?;
+    let main_media = form_raw_media(&data["main_media_type"], &data["main_media_hd"])?;
     results.push(main_media);
 
     if let Value::Array(child_media_vector) = &data["child_medias_hd"] {
@@ -29,9 +26,7 @@ pub fn parse_json(
     Ok((caption, results))
 }
 
-fn form_raw_media(
-    media_type: &Value, url: &Value,
-) -> Result<RawMedia, UserInputError> {
+fn form_raw_media(media_type: &Value, url: &Value) -> Result<RawMedia, UserInputError> {
     let media_type_unpacked = match media_type {
         Value::String(main_media_type) => Ok(main_media_type),
         _ => Err(UserInputError::NoResult),
