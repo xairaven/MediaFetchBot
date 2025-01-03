@@ -30,28 +30,22 @@ impl BotConfig {
         let name = env::var("BOT_NAME").map_err(|_| EnvError::NameNotLoaded)?;
 
         // Loading log level
-        let log_level = env::var("LOG_LEVEL").map_err(|_| EnvError::LogLevelNotLoaded)?;
-        let log_level = match log_level.to_lowercase().trim() {
-            "off" => LevelFilter::Off,
-            "error" => LevelFilter::Error,
-            "warn" => LevelFilter::Warn,
-            "info" => LevelFilter::Info,
-            "debug" => LevelFilter::Debug,
-            "trace" => LevelFilter::Trace,
-            _ => return Err(EnvError::LogLevelUndefined),
-        };
+        let log_level = env::var("LOG_LEVEL")
+            .map_err(|_| EnvError::LogLevelNotLoaded)?
+            .parse::<LevelFilter>()
+            .map_err(|_| EnvError::LogLevelUndefined)?;
 
         // Loading option LOG_FORMAT
-        let log_format = env::var("LOG_FORMAT");
-        let log_format = match log_format {
+        let log_format = match env::var("LOG_FORMAT") {
             Ok(value) if !value.trim().is_empty() => value,
             _ => "[%Y-%m-%D %H-%M-%S %LEVEL %TARGET] %MESSAGE".to_string(),
         };
 
         // Loading option WHITELIST_ENABLED
-        let whitelist_enabled =
-            env::var("WHITELIST").map_err(|_| EnvError::WhitelistEnabledNotLoaded)?;
-        let whitelist_enabled = match whitelist_enabled.trim() {
+        let whitelist_enabled = match env::var("WHITELIST")
+            .map_err(|_| EnvError::WhitelistEnabledNotLoaded)?
+            .trim()
+        {
             "ON" => true,
             "OFF" => false,
             _ => return Err(EnvError::WhitelistEnabledUndefined),
@@ -67,15 +61,13 @@ impl BotConfig {
         }
 
         // Loading TikTok API Key
-        let tiktok_api_key = env::var("TIKTOK_API_KEY");
-        let tiktok_api_key = match tiktok_api_key {
+        let tiktok_api_key = match env::var("TIKTOK_API_KEY") {
             Ok(value) if !value.trim().is_empty() => Some(value),
             _ => None,
         };
 
         // Loading Instagram API Key
-        let instagram_api_key = env::var("INSTAGRAM_API_KEY");
-        let instagram_api_key = match instagram_api_key {
+        let instagram_api_key = match env::var("INSTAGRAM_API_KEY") {
             Ok(value) if !value.trim().is_empty() => Some(value),
             _ => None,
         };
