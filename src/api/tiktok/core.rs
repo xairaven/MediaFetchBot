@@ -1,13 +1,11 @@
-use crate::api::Response;
-use crate::errors::api::ApiError;
-use crate::errors::error_type::ErrorType;
-use crate::errors::user_input::UserInputError;
+use crate::api::{ApiError, Response};
+use crate::error::{Error, UserInputError};
 use crate::media::RawMedia;
 use reqwest::header;
 use reqwest::header::HeaderValue;
 use serde_json::Value;
 
-pub async fn get_response(api_key: &str, link: &str) -> Result<Response, ErrorType> {
+pub async fn get_response(api_key: &str, link: &str) -> Result<Response, Error> {
     let json_response = request(api_key, link).await?;
     let deserialized_json: Value = serde_json::from_str(&json_response)
         .map_err(|_| ApiError::FailedParseResponse)?;

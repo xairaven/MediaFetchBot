@@ -1,5 +1,5 @@
 use crate::api::instagram::core::ParsedResponse;
-use crate::errors::user_input::UserInputError;
+use crate::error::UserInputError;
 use crate::media::RawMedia;
 use serde_json::Value;
 

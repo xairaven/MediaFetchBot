@@ -10,7 +10,6 @@
   "TiktokQuotaExceeded": "TikTok API Quota Exceeded. Upgrade your plan.",
   "WrongApiHost": "x-rapidapi-host header is wrong.",
   "WrongApiKey": "x-rapidapi-key header is wrong.",
-  "WrongMediaFormat": "Wrong media format passed to instagram handlers",
 
   "ConfigNotLoaded": "Something wrong with .env file. May be, it not exists.",
   "LogLevelNotLoaded": "Something wrong with .env LOG_LEVEL. May be, there's no field with this name.",
@@ -27,7 +26,7 @@
 
   "NoResult": "Unfortunately, there's no content at this link.",
 
-  "BackendError": "<b>Error message:</b>\nSomething is wrong either with the bot or with API.\nPlease report this incident to the bot administrator.",
+  "ServerError": "<b>Error message:</b>\nSomething is wrong either with the bot or with API.\nPlease report this incident to the bot administrator.",
   "UserError": "User Error. Something wrong with user input",
   "NotWhitelisted": "You are not in the whitelist. If you believe this is a mistake, please contact the administrator."
 }

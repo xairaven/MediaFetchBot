@@ -1,7 +1,6 @@
 use crate::api::instagram::{post, story};
-use crate::api::Response;
-use crate::errors::api::ApiError;
-use crate::errors::error_type::ErrorType;
+use crate::api::{ApiError, Response};
+use crate::error::Error;
 use crate::media::RawMedia;
 use reqwest::header::{HeaderMap, HeaderValue};
 use reqwest::Client;
@@ -22,7 +21,7 @@ impl ContentType {
     }
 }
 
-pub async fn get_response(api_key: &str, link: &str) -> Result<Response, ErrorType> {
+pub async fn get_response(api_key: &str, link: &str) -> Result<Response, Error> {
     let content_type = ContentType::choose(link);
     let json_response = request(api_key, &content_type, link).await?;
     let deserialized_json: Value = serde_json::from_str(&json_response)

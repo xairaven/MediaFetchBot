@@ -1,5 +1,5 @@
 use crate::bot::config::BotConfig;
-use crate::errors::error_type::ErrorType;
+use crate::error::Error;
 use crate::logger;
 use rust_i18n::t;
 use teloxide::adaptors::Throttle;
@@ -7,6 +7,7 @@ use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{Message, Requester, ResponseResult};
 use teloxide::types::{InputMedia, ParseMode};
 use teloxide::Bot;
+use thiserror::Error;
 
 mod instagram {
     pub mod core;
@@ -59,7 +60,7 @@ impl Api {
             Ok(response) => response.send(bot, msg, &link).await?,
             Err(err) => {
                 let error_text = match err {
-                    ErrorType::Backend(ref specific_err) => {
+                    Error::Server(ref specific_err) => {
                         log::error!(
                             "{}",
                             format!(
@@ -72,7 +73,7 @@ impl Api {
 
                         format!("{}", t!(err.to_string()))
                     },
-                    ErrorType::User(specific_err) => {
+                    Error::User(specific_err) => {
                         log::warn!(
                             "{}",
                             format!(
@@ -147,4 +148,28 @@ impl Response {
 
         Ok(())
     }
+}
+
+#[derive(Debug, Error)]
+pub enum ApiError {
+    #[error("FailedGetResponse")]
+    FailedGetResponse,
+
+    #[error("FailedParseResponse")]
+    FailedParseResponse,
+
+    #[error("FailedParseUrl")]
+    FailedParseUrl,
+
+    #[error("InstagramQuotaExceeded")]
+    InstagramQuotaExceeded,
+
+    #[error("TiktokQuotaExceeded")]
+    TiktokQuotaExceeded,
+
+    #[error("WrongApiHost")]
+    WrongApiHost,
+
+    #[error("WrongApiKey")]
+    WrongApiKey,
 }

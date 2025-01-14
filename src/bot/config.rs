@@ -1,7 +1,7 @@
-use crate::errors::env::EnvError;
 use dotenvy::dotenv;
 use log::LevelFilter;
 use std::{env, fs};
+use thiserror::Error;
 
 const WHITELIST_FILE_NAME: &str = "whitelist.json";
 
@@ -84,4 +84,34 @@ impl BotConfig {
             instagram_api_key,
         })
     }
+}
+
+#[derive(Debug, Error)]
+pub enum EnvError {
+    #[error("ConfigNotLoaded")]
+    ConfigNotLoaded,
+
+    #[error("LogLevelNotLoaded")]
+    LogLevelNotLoaded,
+
+    #[error("LogLevelUndefined")]
+    LogLevelUndefined,
+
+    #[error("WhitelistEnabledNotLoaded")]
+    WhitelistEnabledNotLoaded,
+
+    #[error("WhitelistEnabledUndefined")]
+    WhitelistEnabledUndefined,
+
+    #[error("WhitelistFileOpeningFailed")]
+    WhitelistFileOpeningFailed,
+
+    #[error("WhitelistParseFailed")]
+    WhitelistParseFailed,
+
+    #[error("NameNotLoaded")]
+    NameNotLoaded,
+
+    #[error("TokenNotLoaded")]
+    TokenNotLoaded,
 }

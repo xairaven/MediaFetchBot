@@ -1,7 +1,7 @@
 use crate::api::Api;
 use crate::bot::commands::BotCommand;
 use crate::bot::config::BotConfig;
-use crate::errors::user_input::UserInputError;
+use crate::error::UserInputError;
 use rust_i18n::t;
 use std::process;
 use std::sync::Arc;
@@ -101,7 +101,7 @@ mod bot {
     pub mod config;
 }
 mod api;
-mod errors;
+mod error;
 mod logger;
 mod media;
 mod whitelist;

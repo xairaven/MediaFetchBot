@@ -1,4 +1,4 @@
-use crate::errors::user_input::UserInputError;
+use crate::error::UserInputError;
 use crate::logger;
 use rust_i18n::t;
 use teloxide::adaptors::Throttle;

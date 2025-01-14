@@ -1,4 +1,4 @@
-use crate::errors::api::ApiError;
+use crate::api::ApiError;
 use teloxide::types::{
     InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo,
 };

@@ -1,4 +1,14 @@
+use crate::api::ApiError;
 use thiserror::Error;
+
+#[derive(Error, Debug)]
+pub enum Error {
+    #[error("ServerError")]
+    Server(#[from] ApiError),
+
+    #[error("UserError")]
+    User(#[from] UserInputError),
+}
 
 #[derive(Debug, Error)]
 pub enum UserInputError {
