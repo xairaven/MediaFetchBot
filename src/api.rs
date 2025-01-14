@@ -106,24 +106,14 @@ impl Response {
     pub async fn send(
         self, bot: &Throttle<Bot>, msg: &Message, link: &str,
     ) -> ResponseResult<()> {
-        let mut images = vec![];
-        let mut music = vec![];
-        let mut videos = vec![];
+        let (mut images, mut music, mut videos) = (vec![], vec![], vec![]);
 
         for input_media in self.media {
-            if let InputMedia::Photo(_) = input_media {
-                images.push(input_media);
-                continue;
-            }
-
-            if let InputMedia::Audio(_) = input_media {
-                music.push(input_media);
-                continue;
-            }
-
-            if let InputMedia::Video(_) = input_media {
-                videos.push(input_media);
-                continue;
+            match input_media {
+                InputMedia::Photo(_) => images.push(input_media),
+                InputMedia::Video(_) => videos.push(input_media),
+                InputMedia::Audio(_) => music.push(input_media),
+                _ => continue,
             }
         }
 
