@@ -1,8 +1,9 @@
+use crate::api::instagram::core::ParsedResponse;
 use crate::errors::user_input::UserInputError;
-use crate::rapid_api::media::RawMedia;
+use crate::media::RawMedia;
 use serde_json::Value;
 
-pub fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
+pub fn parse_response(json: Value) -> Result<ParsedResponse, UserInputError> {
     let mut results: Vec<RawMedia> = vec![];
 
     let data = &json["data"];
@@ -23,7 +24,10 @@ pub fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError
         }
     }
 
-    Ok((caption, results))
+    Ok(ParsedResponse {
+        title: caption,
+        media: results,
+    })
 }
 
 fn form_raw_media(media_type: &Value, url: &Value) -> Result<RawMedia, UserInputError> {

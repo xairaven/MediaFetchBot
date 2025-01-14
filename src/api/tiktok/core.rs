@@ -1,30 +1,31 @@
+use crate::api::Response;
+use crate::errors::api::ApiError;
+use crate::errors::error_type::ErrorType;
+use crate::errors::user_input::UserInputError;
+use crate::media::RawMedia;
 use reqwest::header;
 use reqwest::header::HeaderValue;
 use serde_json::Value;
-use std::collections::HashMap;
-use teloxide::types::{
-    InputFile, InputMedia, InputMediaAudio, InputMediaPhoto, InputMediaVideo,
-};
-use url::Url;
 
-use crate::errors::api::ApiError;
-use crate::errors::user_input::UserInputError;
-use crate::rapid_api::media::{MediaFormat, RawMedia};
-use crate::rapid_api::{InputMediaMap, RapidApiResults};
-use crate::utils::response_processing;
+pub async fn get_response(api_key: &str, link: &str) -> Result<Response, ErrorType> {
+    let json_response = request(api_key, link).await?;
+    let deserialized_json: Value = serde_json::from_str(&json_response)
+        .map_err(|_| ApiError::FailedParseResponse)?;
+    let response = parse_response(deserialized_json)?;
 
-pub async fn get_results(api_key: &str, link: String) -> RapidApiResults {
-    let response = get_response(api_key, link).await?;
-    let json = response_processing::to_json(response)?;
+    let mut input_media = vec![];
+    for raw in response.media {
+        input_media.push(raw.to_input_media()?);
+    }
 
-    let (post_title, raw_media_documents) = parse_json(json)?;
-
-    let input_media_map = convert_raw_to_input_media(raw_media_documents)?;
-
-    Ok((post_title, input_media_map))
+    let response = Response {
+        title: response.title,
+        media: input_media,
+    };
+    Ok(response)
 }
 
-async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, ApiError> {
+async fn request(api_key: &str, link: &str) -> Result<String, ApiError> {
     let mut headers = header::HeaderMap::new();
 
     let host_value: HeaderValue = "tiktok-download-without-watermark.p.rapidapi.com"
@@ -32,8 +33,7 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, ApiE
         .map_err(|_| ApiError::WrongApiHost)?;
     headers.insert("x-rapidapi-host", host_value);
 
-    let key_value: HeaderValue =
-        tiktok_api_key.parse().map_err(|_| ApiError::WrongApiKey)?;
+    let key_value: HeaderValue = api_key.parse().map_err(|_| ApiError::WrongApiKey)?;
     headers.insert("x-rapidapi-key", key_value);
 
     let client = reqwest::Client::builder()
@@ -65,7 +65,12 @@ async fn get_response(tiktok_api_key: &str, link: String) -> Result<String, ApiE
     Ok(response_text)
 }
 
-fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
+pub struct ParsedResponse {
+    pub title: String,
+    pub media: Vec<RawMedia>,
+}
+
+fn parse_response(json: Value) -> Result<ParsedResponse, UserInputError> {
     let mut results: Vec<RawMedia> = vec![];
 
     let data = &json["data"];
@@ -97,29 +102,8 @@ fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
         results.push(RawMedia::video(play));
     }
 
-    Ok((title, results))
-}
-
-fn convert_raw_to_input_media(
-    raw_media_documents: Vec<RawMedia>,
-) -> Result<InputMediaMap, ApiError> {
-    let mut files: InputMediaMap = HashMap::new();
-    // Parsing vector of results
-    for raw_media in raw_media_documents {
-        let href = raw_media.href;
-
-        let url: Url = href.parse().map_err(|_| ApiError::FailedParseUrl)?;
-
-        let file = InputFile::url(url);
-        let file = match &raw_media.format {
-            MediaFormat::Image => InputMedia::Photo(InputMediaPhoto::new(file)),
-            MediaFormat::Music => InputMedia::Audio(InputMediaAudio::new(file)),
-            MediaFormat::Video => InputMedia::Video(InputMediaVideo::new(file)),
-        };
-
-        let vector = files.entry(raw_media.format).or_default();
-        vector.push(file);
-    }
-
-    Ok(files)
+    Ok(ParsedResponse {
+        title,
+        media: results,
+    })
 }

@@ -1,9 +1,10 @@
+use crate::api::instagram::core::ParsedResponse;
 use crate::errors::user_input::UserInputError;
-use crate::rapid_api::media::RawMedia;
+use crate::media::RawMedia;
 use serde_json::Value;
 
-pub fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError> {
-    let mut result_vector: Vec<RawMedia> = Vec::new();
+pub fn parse_response(json: Value) -> Result<ParsedResponse, UserInputError> {
+    let mut results: Vec<RawMedia> = Vec::new();
 
     let data = &json["data"];
 
@@ -17,14 +18,20 @@ pub fn parse_json(json: Value) -> Result<(String, Vec<RawMedia>), UserInputError
 
     if let Value::String(video_url) = &data["video_hd"] {
         let raw_media = RawMedia::video(video_url.to_string());
-        result_vector.push(raw_media);
-        return Ok((caption, result_vector));
+        results.push(raw_media);
+        return Ok(ParsedResponse {
+            title: caption,
+            media: results,
+        });
     }
 
     if let Value::String(img_url) = &data["image_hd"] {
         let raw_media = RawMedia::image(img_url.to_string());
-        result_vector.push(raw_media);
-        Ok((caption, result_vector))
+        results.push(raw_media);
+        Ok(ParsedResponse {
+            title: caption,
+            media: results,
+        })
     } else {
         Err(UserInputError::NoResult)
     }

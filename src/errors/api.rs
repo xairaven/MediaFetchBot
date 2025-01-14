@@ -22,7 +22,4 @@ pub enum ApiError {
 
     #[error("WrongApiKey")]
     WrongApiKey,
-
-    #[error("WrongMediaFormat")]
-    WrongMediaFormat,
 }

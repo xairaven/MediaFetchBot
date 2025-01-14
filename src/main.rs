@@ -1,3 +1,4 @@
+use crate::api::Api;
 use crate::bot::commands::BotCommand;
 use crate::bot::config::BotConfig;
 use crate::errors::user_input::UserInputError;
@@ -67,13 +68,14 @@ async fn handle_message(
         return command.handle(bot, msg).await;
     }
 
-    let api_instances = rapid_api::api_factory(&bot_config);
+    let api_instances = Api::instances_from_config(&bot_config);
     let instance = api_instances
         .iter()
         .find(|instance| text.contains(&instance.base_url()));
+
     match instance {
         Some(instance) => {
-            instance.handle_link(text, &bot, &msg).await?;
+            instance.handle_link(text.to_string(), &bot, &msg).await?;
         },
         None => {
             bot.send_message(
@@ -98,10 +100,8 @@ mod bot {
     pub mod commands;
     pub mod config;
 }
+mod api;
 mod errors;
-mod instagram;
 mod logger;
-mod rapid_api;
-mod tiktok;
-mod utils;
+mod media;
 mod whitelist;

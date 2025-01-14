@@ -1,0 +1,150 @@
+use crate::bot::config::BotConfig;
+use crate::errors::error_type::ErrorType;
+use crate::logger;
+use rust_i18n::t;
+use teloxide::adaptors::Throttle;
+use teloxide::payloads::SendMessageSetters;
+use teloxide::prelude::{Message, Requester, ResponseResult};
+use teloxide::types::{InputMedia, ParseMode};
+use teloxide::Bot;
+
+mod instagram {
+    pub mod core;
+
+    pub mod post;
+    pub mod story;
+}
+mod tiktok {
+    pub mod core;
+}
+
+pub enum Api {
+    TikTok { key: String },
+    Instagram { key: String },
+}
+
+impl Api {
+    pub fn base_url(&self) -> String {
+        match self {
+            Api::TikTok { .. } => String::from("tiktok.com"),
+            Api::Instagram { .. } => String::from("instagram.com"),
+        }
+    }
+
+    pub fn instances_from_config(config: &BotConfig) -> Vec<Self> {
+        let mut instances = vec![];
+
+        if let Some(key) = &config.tiktok_api_key {
+            let api = Api::TikTok { key: key.clone() };
+            instances.push(api);
+        }
+
+        if let Some(key) = &config.instagram_api_key {
+            let api = Api::Instagram { key: key.clone() };
+            instances.push(api);
+        }
+
+        instances
+    }
+
+    pub async fn handle_link(
+        &self, link: String, bot: &Throttle<Bot>, msg: &Message,
+    ) -> ResponseResult<()> {
+        let response = match self {
+            Api::TikTok { key } => tiktok::core::get_response(key, &link).await,
+            Api::Instagram { key } => instagram::core::get_response(key, &link).await,
+        };
+
+        match response {
+            Ok(response) => response.send(bot, msg, &link).await?,
+            Err(err) => {
+                let error_text = match err {
+                    ErrorType::Backend(ref specific_err) => {
+                        log::error!(
+                            "{}",
+                            format!(
+                                "User: {}. {} -> ErrQuery: {}",
+                                specific_err,
+                                logger::get_sender_identifier(msg),
+                                link,
+                            )
+                        );
+
+                        format!("{}", t!(err.to_string()))
+                    },
+                    ErrorType::User(specific_err) => {
+                        log::warn!(
+                            "{}",
+                            format!(
+                                "User: {} -> ErrQuery: {}",
+                                logger::get_sender_identifier(msg),
+                                link
+                            )
+                        );
+
+                        format!("{}", t!(specific_err.to_string()))
+                    },
+                };
+
+                bot.send_message(msg.chat.id, error_text)
+                    .parse_mode(ParseMode::Html)
+                    .await?;
+            },
+        }
+
+        Ok(())
+    }
+}
+
+pub struct Response {
+    pub title: String,
+    pub media: Vec<InputMedia>,
+}
+
+impl Response {
+    pub async fn send(
+        self, bot: &Throttle<Bot>, msg: &Message, link: &str,
+    ) -> ResponseResult<()> {
+        let mut images = vec![];
+        let mut music = vec![];
+        let mut videos = vec![];
+
+        for input_media in self.media {
+            if let InputMedia::Photo(_) = input_media {
+                images.push(input_media);
+                continue;
+            }
+
+            if let InputMedia::Audio(_) = input_media {
+                music.push(input_media);
+                continue;
+            }
+
+            if let InputMedia::Video(_) = input_media {
+                videos.push(input_media);
+                continue;
+            }
+        }
+
+        if !images.is_empty() {
+            bot.send_media_group(msg.chat.id, images).await?;
+        }
+        if !videos.is_empty() {
+            bot.send_media_group(msg.chat.id, videos).await?;
+        }
+        if !music.is_empty() {
+            bot.send_media_group(msg.chat.id, music).await?;
+        }
+
+        if !self.title.is_empty() {
+            bot.send_message(msg.chat.id, self.title).await?;
+        }
+
+        log::info!(
+            "{}",
+            format!("User: {} -> {}", logger::get_sender_identifier(msg), link)
+        );
+
+        Ok(())
+    }
+}
