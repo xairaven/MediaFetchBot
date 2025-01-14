@@ -3,23 +3,23 @@ name = "media_fetch_bot"
 authors = ["Alex Kovalov <alexkovalevkpi@gmail.com>"]
 version = "0.3.0"
 edition = "2021"
-rust-version = "1.83"
+rust-version = "1.84"
 repository = "https://github.com/xairaven/MediaFetchBot"
 
 [dependencies]
 teloxide = { version =  "0.13.0", features = ["macros", "throttle"] }
 
-tokio = { version =  "1.42.0", features = ["rt-multi-thread", "macros"] }
-async-trait = "0.1.84"
+tokio = { version =  "1.43.0", features = ["rt-multi-thread", "macros"] }
+async-trait = "0.1.85"
 dotenvy = "0.15.7"
 chrono = "0.4.39"
 fern = "0.7.1"
-log = "0.4.22"
-thiserror = "2.0.9"
+log = "0.4.25"
+thiserror = "2.0.11"
 reqwest = { version = "0.12.12", features = ["json", "blocking"] }
 rust-i18n = "3.1.2"
 strum = "0.26.3"
 strum_macros = "0.26.4"
 serde = { version = "1.0.217", features = ["derive"] }
-serde_json = "1.0.134"
+serde_json = "1.0.135"
 url = "2.5.4"
