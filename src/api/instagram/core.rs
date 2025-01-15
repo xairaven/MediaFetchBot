@@ -148,6 +148,15 @@ fn parse_response_story(json: Value) -> Result<ParsedResponse, UserInputError> {
         None
     };
 
+    if let Value::Bool(error) = &download_info["error"] {
+        if *error {
+            let additional_info = download_info["message"]
+                .as_str()
+                .map(|error_message| error_message.to_string());
+            return Err(UserInputError::InstagramFailedGetContent(additional_info));
+        }
+    }
+
     let medias = match &download_info["medias"] {
         Value::Array(array) => array,
         _ => {

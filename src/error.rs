@@ -23,4 +23,16 @@ pub enum UserInputError {
 
     #[error("NotWhitelisted")]
     NotWhitelisted,
+
+    #[error("InstagramFailedGetContent")]
+    InstagramFailedGetContent(Option<String>),
+}
+
+impl UserInputError {
+    pub fn additional_info(&self) -> Option<String> {
+        match self {
+            Self::InstagramFailedGetContent(value) => value.clone(),
+            _ => None,
+        }
+    }
 }

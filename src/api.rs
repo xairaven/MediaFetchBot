@@ -104,7 +104,13 @@ impl Api {
                             )
                         );
 
-                        format!("{}", t!(specific_err.to_string()))
+                        let mut message = format!("{}", t!(specific_err.to_string()));
+
+                        if let Some(additional_info) = specific_err.additional_info() {
+                            message += &format!(" Additional info: {}", additional_info);
+                        }
+
+                        message
                     },
                 };
 
