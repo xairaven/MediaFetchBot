@@ -16,12 +16,16 @@ mod instagram {
 mod tiktok {
     pub mod core;
 }
+mod youtube {
+    pub mod core;
+}
 
 pub enum Api {
     TikTok { key: String },
     InstagramPhotos { key: String },
     InstagramReels { key: String },
     InstagramStories { key: String },
+    Youtube { key: String },
 }
 
 impl Api {
@@ -31,6 +35,7 @@ impl Api {
             Api::InstagramReels { .. } => String::from("instagram.com/reel/"),
             Api::InstagramStories { .. } => String::from("instagram.com/stories/"),
             Api::TikTok { .. } => String::from("tiktok.com"),
+            Api::Youtube { .. } => String::from("youtube.com"),
         }
     }
 
@@ -57,6 +62,11 @@ impl Api {
             instances.push(api);
         }
 
+        if let Some(key) = &config.youtube_api_key {
+            let api = Api::Youtube { key: key.clone() };
+            instances.push(api);
+        }
+
         instances
     }
 
@@ -74,6 +84,7 @@ impl Api {
             Api::InstagramStories { key } => {
                 instagram::core::get_response(key, &link, ContentType::Stories).await
             },
+            Api::Youtube { key } => youtube::core::get_response(key, &link).await,
         };
 
         match response {

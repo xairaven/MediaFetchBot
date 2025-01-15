@@ -18,6 +18,8 @@ pub struct BotConfig {
     pub instagram_photos_api_key: Option<String>,
     pub instagram_reels_api_key: Option<String>,
     pub instagram_stories_api_key: Option<String>,
+
+    pub youtube_api_key: Option<String>,
 }
 
 impl BotConfig {
@@ -88,6 +90,12 @@ impl BotConfig {
             _ => None,
         };
 
+        // Loading YouTube API Key
+        let youtube_api_key = match env::var("YOUTUBE_API_KEY") {
+            Ok(value) if !value.trim().is_empty() => Some(value),
+            _ => None,
+        };
+
         // Returning Config var
         Ok(BotConfig {
             token,
@@ -102,6 +110,8 @@ impl BotConfig {
             instagram_photos_api_key,
             instagram_reels_api_key,
             instagram_stories_api_key,
+
+            youtube_api_key,
         })
     }
 }
