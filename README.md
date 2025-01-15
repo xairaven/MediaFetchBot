@@ -4,7 +4,7 @@ Looking for an easy way to **download TikTok, Instagram or YouTube content?**
 I'm proud to present **an open-source Telegram bot** written in 🦀**Rust**🦀 using the **Teloxide**🤖 library.
 This bot allows you to effortlessly download content by **simply sending a link**.
 
-![](https://img.shields.io/github/actions/workflow/status/xairaven/MediaFetchBot/release_bot.yml?style=plastic)
+![](https://img.shields.io/github/actions/workflow/status/xairaven/MediaFetchBot/release.yml?style=plastic)
 ![](https://img.shields.io/github/v/release/xairaven/MediaFetchBot?style=plastic)
 ![](https://img.shields.io/github/commit-activity/m/xairaven/MediaFetchBot?style=plastic)
 ![](https://img.shields.io/github/license/xairaven/MediaFetchBot?style=plastic)
