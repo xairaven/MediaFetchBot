@@ -1,6 +1,6 @@
 <h1 align="center">Media Fetch Bot</h1>
 
-Looking for an easy way to **download TikTok or Instagram content?**
+Looking for an easy way to **download TikTok, Instagram or YouTube content?**
 I'm proud to present **an open-source Telegram bot** written in 🦀**Rust**🦀 using the **Teloxide**🤖 library.
 This bot allows you to effortlessly download content by **simply sending a link**.
 
@@ -18,6 +18,7 @@ This bot allows you to effortlessly download content by **simply sending a link*
 - **[Instagram Photos Downloader API](https://rapidapi.com/easeapi-easeapi-default/api/instagram-photos-downloader-api)**
 - **[Instagram Reels Downloader API](https://rapidapi.com/easeapi-easeapi-default/api/instagram-reels-downloader-api)**
 - **[Instagram Story Downloader API](https://rapidapi.com/easeapi-easeapi-default/api/instagram-story-downloader-api)**
+- **[YouTube Video & MP3 Downloader API](https://rapidapi.com/easeapi-easeapi-default/api/youtube-video-mp3-downloader-api)**
 - **[Telegram Bot Token](https://t.me/BotFather)**
 - **Windows 10 x64 or Ubuntu x64** *<optional>*
 - **Docker** *<optional>*
@@ -48,6 +49,9 @@ TIKTOK_API_KEY=...
 INSTAGRAM_PHOTOS_API_KEY=...
 INSTAGRAM_REELS_API_KEY=...
 INSTAGRAM_STORIES_API_KEY=...
+
+# Optional
+YOUTUBE_API_KEY=...
 ```
 
 Place it in the location specified in the instruction for the preferred method.
@@ -137,7 +141,7 @@ Congrats!🥳 The bot is working now.
 <h2>Available Inputs:</h2>
 
 - `/help` — Instruction. You can also change localization text. For that, change the text in `media_fetch_bot/locales/en.json`.
-- TikTok or Instagram Link — Get your content! Videos, Photo Slides, Instagram Photos, Reels and Stories available.
+- TikTok, Instagram or YouTube Link — Get your content! Enjoy 🎉
 
 <h2>Contributions</h2>
 
