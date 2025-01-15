@@ -163,6 +163,9 @@ impl Response {
 
 #[derive(Debug, Error)]
 pub enum ApiError {
+    #[error("ClientBuildingFailed")]
+    ClientBuildingFailed,
+
     #[error("FailedGetResponse")]
     FailedGetResponse,
 

@@ -37,7 +37,7 @@ async fn request(api_key: &str, link: &str) -> Result<String, ApiError> {
     let client = reqwest::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .build()
-        .unwrap();
+        .map_err(|_| ApiError::ClientBuildingFailed)?;
 
     let request_body = format!(
         "https://tiktok-download-without-watermark.p.rapidapi.com/analysis?url={}&hd=0",

@@ -59,7 +59,7 @@ async fn request(
     let client = reqwest::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .build()
-        .unwrap();
+        .map_err(|_| ApiError::ClientBuildingFailed)?;
 
     let request_body = match content_type {
         ContentType::Photos | ContentType::Reels => format!(
