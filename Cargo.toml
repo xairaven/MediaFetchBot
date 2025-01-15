@@ -1,10 +1,16 @@
 [package]
 name = "media_fetch_bot"
-authors = ["Alex Kovalov <alexkovalevkpi@gmail.com>"]
 version = "0.4.0"
+authors = ["Alex Kovalov <alexkovalevkpi@gmail.com>"]
+categories = ["multimedia"]
+keywords = ["telegram", "media", "bot"]
 edition = "2021"
 rust-version = "1.84"
+readme = "README.md"
+license = "MIT"
 repository = "https://github.com/xairaven/MediaFetchBot"
+homepage = "https://github.com/xairaven/MediaFetchBot"
+description = "A Telegram bot written in Rust that downloads videos and photo-slides from TikTok & Instagram. Send a link, get the media file instantly."
 
 [dependencies]
 teloxide = { version =  "0.13.0", features = ["macros", "throttle"] }
