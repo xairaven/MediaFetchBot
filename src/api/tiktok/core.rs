@@ -64,7 +64,7 @@ async fn request(api_key: &str, link: &str) -> Result<String, ApiError> {
 }
 
 pub struct ParsedResponse {
-    pub title: String,
+    pub title: Option<String>,
     pub media: Vec<RawMedia>,
 }
 
@@ -73,9 +73,9 @@ fn parse_response(json: Value) -> Result<ParsedResponse, UserInputError> {
 
     let data = &json["data"];
 
-    let title: String = match &data["title"] {
-        Value::String(value) => value.to_string(),
-        _ => String::new(),
+    let title: Option<String> = match &data["title"] {
+        Value::String(value) => Some(value.to_string()),
+        _ => None,
     };
 
     let play = match &data["play"] {

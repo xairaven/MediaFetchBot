@@ -12,8 +12,12 @@ pub struct BotConfig {
     pub log_format: String,
     pub whitelist_enabled: bool,
     pub whitelist: Vec<u64>,
+
     pub tiktok_api_key: Option<String>,
-    pub instagram_api_key: Option<String>,
+
+    pub instagram_photos_api_key: Option<String>,
+    pub instagram_reels_api_key: Option<String>,
+    pub instagram_stories_api_key: Option<String>,
 }
 
 impl BotConfig {
@@ -66,8 +70,20 @@ impl BotConfig {
             _ => None,
         };
 
-        // Loading Instagram API Key
-        let instagram_api_key = match env::var("INSTAGRAM_API_KEY") {
+        // Loading Instagram Photos API Key
+        let instagram_photos_api_key = match env::var("INSTAGRAM_PHOTOS_API_KEY") {
+            Ok(value) if !value.trim().is_empty() => Some(value),
+            _ => None,
+        };
+
+        // Loading Instagram Photos API Key
+        let instagram_reels_api_key = match env::var("INSTAGRAM_REELS_API_KEY") {
+            Ok(value) if !value.trim().is_empty() => Some(value),
+            _ => None,
+        };
+
+        // Loading Instagram Photos API Key
+        let instagram_stories_api_key = match env::var("INSTAGRAM_STORIES_API_KEY") {
             Ok(value) if !value.trim().is_empty() => Some(value),
             _ => None,
         };
@@ -80,8 +96,12 @@ impl BotConfig {
             log_format,
             whitelist_enabled,
             whitelist,
+
             tiktok_api_key,
-            instagram_api_key,
+
+            instagram_photos_api_key,
+            instagram_reels_api_key,
+            instagram_stories_api_key,
         })
     }
 }

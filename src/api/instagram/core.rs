@@ -1,35 +1,27 @@
-use crate::api::instagram::{post, story};
 use crate::api::{ApiError, Response};
-use crate::error::Error;
+use crate::error::{Error, UserInputError};
 use crate::media::RawMedia;
-use reqwest::header::{HeaderMap, HeaderValue};
-use reqwest::Client;
+use reqwest::header;
+use reqwest::header::HeaderValue;
 use serde_json::Value;
 
 pub enum ContentType {
-    Post,
-    Story,
+    Photos,
+    Reels,
+    Stories,
 }
 
-impl ContentType {
-    pub fn choose(link: &str) -> Self {
-        if link.contains("stories") {
-            Self::Story
-        } else {
-            Self::Post
-        }
-    }
-}
-
-pub async fn get_response(api_key: &str, link: &str) -> Result<Response, Error> {
-    let content_type = ContentType::choose(link);
-    let json_response = request(api_key, &content_type, link).await?;
+pub async fn get_response(
+    api_key: &str, link: &str, content_type: ContentType,
+) -> Result<Response, Error> {
+    let json_response = request(api_key, link, &content_type).await?;
     let deserialized_json: Value = serde_json::from_str(&json_response)
         .map_err(|_| ApiError::FailedParseResponse)?;
-
     let response = match content_type {
-        ContentType::Post => post::parse_response(deserialized_json)?,
-        ContentType::Story => story::parse_response(deserialized_json)?,
+        ContentType::Photos | ContentType::Reels => {
+            parse_response_post_reels(deserialized_json)?
+        },
+        ContentType::Stories => parse_response_story(deserialized_json)?,
     };
 
     let mut input_media = vec![];
@@ -45,44 +37,54 @@ pub async fn get_response(api_key: &str, link: &str) -> Result<Response, Error> 
 }
 
 async fn request(
-    api_key: &str, content_type: &ContentType, link: &str,
+    api_key: &str, link: &str, content_type: &ContentType,
 ) -> Result<String, ApiError> {
-    let mut headers = HeaderMap::new();
-    headers.insert("Content-Type", "application/json".parse().unwrap());
+    let mut headers = header::HeaderMap::new();
 
-    let host_value: HeaderValue = "instagram-bulk-scraper-latest.p.rapidapi.com"
-        .parse()
-        .map_err(|_| ApiError::WrongApiHost)?;
+    let endpoint = match content_type {
+        ContentType::Photos => "photos",
+        ContentType::Reels => "reels",
+        ContentType::Stories => "story",
+    };
+
+    let host_value: HeaderValue =
+        format!("instagram-{}-downloader-api.p.rapidapi.com", endpoint)
+            .parse()
+            .map_err(|_| ApiError::WrongApiHost)?;
     headers.insert("x-rapidapi-host", host_value);
 
     let key_value: HeaderValue = api_key.parse().map_err(|_| ApiError::WrongApiKey)?;
     headers.insert("x-rapidapi-key", key_value);
 
-    let client = Client::builder()
+    let client = reqwest::Client::builder()
         .redirect(reqwest::redirect::Policy::none())
         .build()
         .unwrap();
 
-    let endpoint = match content_type {
-        ContentType::Post => "media_download_from_url",
-        ContentType::Story => "download_story_from_url",
+    let request_body = match content_type {
+        ContentType::Photos | ContentType::Reels => format!(
+            "https://instagram-{}-downloader-api.p.rapidapi.com/download?url={}",
+            endpoint, link
+        ),
+        ContentType::Stories => format!(
+            "https://instagram-{}-downloader-api.p.rapidapi.com/download?link={}",
+            endpoint, link
+        ),
     };
-    let endpoint_url = format!(
-        "https://instagram-bulk-scraper-latest.p.rapidapi.com/{}",
-        endpoint
-    );
-    let request_body = format!("{{\"url\":\"{}\"}}", link);
 
     let response = client
-        .post(endpoint_url)
+        .get(request_body)
         .headers(headers)
-        .body(request_body)
         .send()
         .await
         .map_err(|_| ApiError::FailedGetResponse)?;
 
     if response.status().is_client_error() {
-        return Err(ApiError::InstagramQuotaExceeded);
+        return match content_type {
+            ContentType::Photos => Err(ApiError::InstagramPhotosQuotaExceeded),
+            ContentType::Reels => Err(ApiError::InstagramReelsQuotaExceeded),
+            ContentType::Stories => Err(ApiError::InstagramStoriesQuotaExceeded),
+        };
     }
 
     let response_text = response
@@ -94,6 +96,81 @@ async fn request(
 }
 
 pub struct ParsedResponse {
-    pub title: String,
+    pub title: Option<String>,
     pub media: Vec<RawMedia>,
+}
+
+fn parse_response_post_reels(json: Value) -> Result<ParsedResponse, UserInputError> {
+    let mut results: Vec<RawMedia> = vec![];
+
+    let data = &json["data"];
+
+    let title: Option<String> = match &data["title"] {
+        Value::String(value) => Some(value.to_string()),
+        _ => None,
+    };
+
+    let medias = match &data["medias"] {
+        Value::Array(array) => array,
+        _ => {
+            return Err(UserInputError::NoResult);
+        },
+    };
+
+    for value in medias {
+        if let (Value::String(url), Value::String(media_type)) =
+            (&value["url"], &value["type"])
+        {
+            if media_type.eq("video") {
+                results.push(RawMedia::video(url.to_string()));
+            } else if media_type.eq("image") {
+                results.push(RawMedia::image(url.to_string()));
+            }
+        } else {
+            return Err(UserInputError::NoResult);
+        }
+    }
+
+    Ok(ParsedResponse {
+        title,
+        media: results,
+    })
+}
+
+fn parse_response_story(json: Value) -> Result<ParsedResponse, UserInputError> {
+    let mut results: Vec<RawMedia> = vec![];
+
+    let data = &json["data"];
+    let download_info = &data["downloadInfo"];
+    let title: Option<String> = if let Value::String(author) = &download_info["author"] {
+        Some(format!("Author: {}", author))
+    } else {
+        None
+    };
+
+    let medias = match &download_info["medias"] {
+        Value::Array(array) => array,
+        _ => {
+            return Err(UserInputError::NoResult);
+        },
+    };
+
+    for value in medias {
+        if let (Value::String(url), Value::String(media_type)) =
+            (&value["url"], &value["type"])
+        {
+            if media_type.eq("video") {
+                results.push(RawMedia::video(url.to_string()));
+            } else if media_type.eq("image") {
+                results.push(RawMedia::image(url.to_string()));
+            }
+        } else {
+            return Err(UserInputError::NoResult);
+        }
+    }
+
+    Ok(ParsedResponse {
+        title,
+        media: results,
+    })
 }

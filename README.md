@@ -15,7 +15,9 @@ This bot allows you to effortlessly download content by **simply sending a link*
 <h2>What do you need to start:</h2>
 
 - **[TikTok Download API Key](https://rapidapi.com/yi005/api/tiktok-download-without-watermark)**
-- **[Instagram Bulk Scraper API Key](https://rapidapi.com/mrngstar/api/instagram-bulk-scraper-latest)**
+- **[Instagram Photos Downloader API](https://rapidapi.com/easeapi-easeapi-default/api/instagram-photos-downloader-api)**
+- **[Instagram Reels Downloader API](https://rapidapi.com/easeapi-easeapi-default/api/instagram-reels-downloader-api)**
+- **[Instagram Story Downloader API](https://rapidapi.com/easeapi-easeapi-default/api/instagram-story-downloader-api)**
 - **[Telegram Bot Token](https://t.me/BotFather)**
 - **Windows 10 x64 or Ubuntu x64** *<optional>*
 - **Docker** *<optional>*
@@ -37,7 +39,9 @@ LOG_FORMAT="..."
 TIKTOK_API_KEY=...
 
 # Optional
-INSTAGRAM_API_KEY=...
+INSTAGRAM_PHOTOS_API_KEY=...
+INSTAGRAM_REELS_API_KEY=...
+INSTAGRAM_STORIES_API_KEY=...
 ```
 
 Place it in the location specified in the instruction for the preferred method.

@@ -6,8 +6,10 @@
   "FailedGetResponse": "Failed to get a response from API.",
   "FailedParseResponse": "Failed to parse response.",
   "FailedParseUrl": "Failed to parse final url.",
-  "InstagramQuotaExceeded": "Instagram API Quota Exceeded. Upgrade your plan.",
   "TiktokQuotaExceeded": "TikTok API Quota Exceeded. Upgrade your plan.",
+  "InstagramPhotosQuotaExceeded": "Instagram Photos API Quota Exceeded. Upgrade your plan.",
+  "InstagramReelsQuotaExceeded": "Instagram Reels API Quota Exceeded. Upgrade your plan.",
+  "InstagramStoriesQuotaExceeded": "Instagram Stories API Quota Exceeded. Upgrade your plan.",
   "WrongApiHost": "x-rapidapi-host header is wrong.",
   "WrongApiKey": "x-rapidapi-key header is wrong.",
 

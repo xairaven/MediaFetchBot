@@ -1,3 +1,4 @@
+use crate::api::instagram::core::ContentType;
 use crate::bot::config::BotConfig;
 use crate::error::Error;
 use crate::logger;
@@ -11,9 +12,6 @@ use thiserror::Error;
 
 mod instagram {
     pub mod core;
-
-    pub mod post;
-    pub mod story;
 }
 mod tiktok {
     pub mod core;
@@ -21,14 +19,18 @@ mod tiktok {
 
 pub enum Api {
     TikTok { key: String },
-    Instagram { key: String },
+    InstagramPhotos { key: String },
+    InstagramReels { key: String },
+    InstagramStories { key: String },
 }
 
 impl Api {
     pub fn base_url(&self) -> String {
         match self {
+            Api::InstagramPhotos { .. } => String::from("instagram.com/p/"),
+            Api::InstagramReels { .. } => String::from("instagram.com/reel/"),
+            Api::InstagramStories { .. } => String::from("instagram.com/stories/"),
             Api::TikTok { .. } => String::from("tiktok.com"),
-            Api::Instagram { .. } => String::from("instagram.com"),
         }
     }
 
@@ -40,8 +42,18 @@ impl Api {
             instances.push(api);
         }
 
-        if let Some(key) = &config.instagram_api_key {
-            let api = Api::Instagram { key: key.clone() };
+        if let Some(key) = &config.instagram_photos_api_key {
+            let api = Api::InstagramPhotos { key: key.clone() };
+            instances.push(api);
+        }
+
+        if let Some(key) = &config.instagram_reels_api_key {
+            let api = Api::InstagramReels { key: key.clone() };
+            instances.push(api);
+        }
+
+        if let Some(key) = &config.instagram_stories_api_key {
+            let api = Api::InstagramStories { key: key.clone() };
             instances.push(api);
         }
 
@@ -53,7 +65,15 @@ impl Api {
     ) -> ResponseResult<()> {
         let response = match self {
             Api::TikTok { key } => tiktok::core::get_response(key, &link).await,
-            Api::Instagram { key } => instagram::core::get_response(key, &link).await,
+            Api::InstagramPhotos { key } => {
+                instagram::core::get_response(key, &link, ContentType::Photos).await
+            },
+            Api::InstagramReels { key } => {
+                instagram::core::get_response(key, &link, ContentType::Reels).await
+            },
+            Api::InstagramStories { key } => {
+                instagram::core::get_response(key, &link, ContentType::Stories).await
+            },
         };
 
         match response {
@@ -64,9 +84,9 @@ impl Api {
                         log::error!(
                             "{}",
                             format!(
-                                "User: {}. {} -> ErrQuery: {}",
-                                specific_err,
+                                "User: {}. Error: {}. Query: {}",
                                 logger::get_sender_identifier(msg),
+                                specific_err,
                                 link,
                             )
                         );
@@ -77,9 +97,10 @@ impl Api {
                         log::warn!(
                             "{}",
                             format!(
-                                "User: {} -> ErrQuery: {}",
+                                "User: {}. Error: {}. Query: {}",
                                 logger::get_sender_identifier(msg),
-                                link
+                                specific_err,
+                                link,
                             )
                         );
 
@@ -98,7 +119,7 @@ impl Api {
 }
 
 pub struct Response {
-    pub title: String,
+    pub title: Option<String>,
     pub media: Vec<InputMedia>,
 }
 
@@ -127,8 +148,8 @@ impl Response {
             bot.send_media_group(msg.chat.id, music).await?;
         }
 
-        if !self.title.is_empty() {
-            bot.send_message(msg.chat.id, self.title).await?;
+        if let Some(title) = self.title {
+            bot.send_message(msg.chat.id, title).await?;
         }
 
         log::info!(
@@ -151,11 +172,17 @@ pub enum ApiError {
     #[error("FailedParseUrl")]
     FailedParseUrl,
 
-    #[error("InstagramQuotaExceeded")]
-    InstagramQuotaExceeded,
-
     #[error("TiktokQuotaExceeded")]
     TiktokQuotaExceeded,
+
+    #[error("InstagramPhotosQuotaExceeded")]
+    InstagramPhotosQuotaExceeded,
+
+    #[error("InstagramReelsQuotaExceeded")]
+    InstagramReelsQuotaExceeded,
+
+    #[error("InstagramStoriesQuotaExceeded")]
+    InstagramStoriesQuotaExceeded,
 
     #[error("WrongApiHost")]
     WrongApiHost,
