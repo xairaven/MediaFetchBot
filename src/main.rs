@@ -1,7 +1,7 @@
 use crate::api::Api;
 use crate::bot::commands::BotCommand;
 use crate::bot::config::BotConfig;
-use crate::error::UserInputError;
+use crate::error::UserOutputError;
 use rust_i18n::t;
 use std::process;
 use std::sync::Arc;
@@ -46,7 +46,7 @@ async fn handle_message(
 ) -> ResponseResult<()> {
     let text = match msg.text() {
         None => {
-            bot.send_message(msg.chat.id, t!(UserInputError::EmptyMessage.to_string()))
+            bot.send_message(msg.chat.id, t!(UserOutputError::EmptyMessage.to_string()))
                 .await?;
             return Ok(());
         },
@@ -80,7 +80,7 @@ async fn handle_message(
         None => {
             bot.send_message(
                 msg.chat.id,
-                t!(UserInputError::LinkTypeUndefined.to_string()),
+                t!(UserOutputError::LinkTypeUndefined.to_string()),
             )
             .await?;
 

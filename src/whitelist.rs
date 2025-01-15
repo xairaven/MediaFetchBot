@@ -1,4 +1,4 @@
-use crate::error::UserInputError;
+use crate::error::UserOutputError;
 use crate::logger;
 use rust_i18n::t;
 use teloxide::adaptors::Throttle;
@@ -21,7 +21,7 @@ pub async fn send_denied_access(
 ) -> ResponseResult<()> {
     bot.send_message(
         user_message.chat.id,
-        t!(UserInputError::NotWhitelisted.to_string()),
+        t!(UserOutputError::NotWhitelisted.to_string()),
     )
     .await?;
     let message = format!(

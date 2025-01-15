@@ -7,11 +7,11 @@ pub enum Error {
     Server(#[from] ApiError),
 
     #[error("UserError")]
-    User(#[from] UserInputError),
+    User(#[from] UserOutputError),
 }
 
 #[derive(Debug, Error)]
-pub enum UserInputError {
+pub enum UserOutputError {
     #[error("EmptyMessage")]
     EmptyMessage,
 
@@ -28,7 +28,7 @@ pub enum UserInputError {
     InstagramFailedGetContent(Option<String>),
 }
 
-impl UserInputError {
+impl UserOutputError {
     pub fn additional_info(&self) -> Option<String> {
         match self {
             Self::InstagramFailedGetContent(value) => value.clone(),

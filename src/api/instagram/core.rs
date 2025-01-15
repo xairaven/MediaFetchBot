@@ -1,5 +1,5 @@
 use crate::api::{ApiError, Response};
-use crate::error::{Error, UserInputError};
+use crate::error::{Error, UserOutputError};
 use crate::media::RawMedia;
 use reqwest::header;
 use reqwest::header::HeaderValue;
@@ -100,7 +100,7 @@ pub struct ParsedResponse {
     pub media: Vec<RawMedia>,
 }
 
-fn parse_response_post_reels(json: Value) -> Result<ParsedResponse, UserInputError> {
+fn parse_response_post_reels(json: Value) -> Result<ParsedResponse, UserOutputError> {
     let mut results: Vec<RawMedia> = vec![];
 
     let data = &json["data"];
@@ -113,7 +113,7 @@ fn parse_response_post_reels(json: Value) -> Result<ParsedResponse, UserInputErr
     let medias = match &data["medias"] {
         Value::Array(array) => array,
         _ => {
-            return Err(UserInputError::NoResult);
+            return Err(UserOutputError::NoResult);
         },
     };
 
@@ -127,7 +127,7 @@ fn parse_response_post_reels(json: Value) -> Result<ParsedResponse, UserInputErr
                 results.push(RawMedia::image(url.to_string()));
             }
         } else {
-            return Err(UserInputError::NoResult);
+            return Err(UserOutputError::NoResult);
         }
     }
 
@@ -137,7 +137,7 @@ fn parse_response_post_reels(json: Value) -> Result<ParsedResponse, UserInputErr
     })
 }
 
-fn parse_response_story(json: Value) -> Result<ParsedResponse, UserInputError> {
+fn parse_response_story(json: Value) -> Result<ParsedResponse, UserOutputError> {
     let mut results: Vec<RawMedia> = vec![];
 
     let data = &json["data"];
@@ -153,14 +153,14 @@ fn parse_response_story(json: Value) -> Result<ParsedResponse, UserInputError> {
             let additional_info = download_info["message"]
                 .as_str()
                 .map(|error_message| error_message.to_string());
-            return Err(UserInputError::InstagramFailedGetContent(additional_info));
+            return Err(UserOutputError::InstagramFailedGetContent(additional_info));
         }
     }
 
     let medias = match &download_info["medias"] {
         Value::Array(array) => array,
         _ => {
-            return Err(UserInputError::NoResult);
+            return Err(UserOutputError::NoResult);
         },
     };
 
@@ -174,7 +174,7 @@ fn parse_response_story(json: Value) -> Result<ParsedResponse, UserInputError> {
                 results.push(RawMedia::image(url.to_string()));
             }
         } else {
-            return Err(UserInputError::NoResult);
+            return Err(UserOutputError::NoResult);
         }
     }
 

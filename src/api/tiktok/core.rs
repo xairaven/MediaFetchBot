@@ -1,5 +1,5 @@
 use crate::api::{ApiError, Response};
-use crate::error::{Error, UserInputError};
+use crate::error::{Error, UserOutputError};
 use crate::media::RawMedia;
 use reqwest::header;
 use reqwest::header::HeaderValue;
@@ -68,7 +68,7 @@ pub struct ParsedResponse {
     pub media: Vec<RawMedia>,
 }
 
-fn parse_response(json: Value) -> Result<ParsedResponse, UserInputError> {
+fn parse_response(json: Value) -> Result<ParsedResponse, UserOutputError> {
     let mut results: Vec<RawMedia> = vec![];
 
     let data = &json["data"];
@@ -81,7 +81,7 @@ fn parse_response(json: Value) -> Result<ParsedResponse, UserInputError> {
     let play = match &data["play"] {
         Value::String(value) => value.to_string(),
         _ => {
-            return Err(UserInputError::NoResult);
+            return Err(UserOutputError::NoResult);
         },
     };
 
