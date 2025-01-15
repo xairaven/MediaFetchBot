@@ -28,3 +28,9 @@ strum_macros = "0.26.4"
 serde = { version = "1.0.217", features = ["derive"] }
 serde_json = "1.0.135"
 url = "2.5.4"
+
+[profile.release]
+lto = true
+opt-level = 3
+panic = "abort"
+strip = "symbols"
