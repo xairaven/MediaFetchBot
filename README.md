@@ -22,6 +22,12 @@ This bot allows you to effortlessly download content by **simply sending a link*
 - **Windows 10 x64 or Ubuntu x64** *<optional>*
 - **Docker** *<optional>*
 
+The bot relies exclusively on free APIs, meaning they might stop functioning at any moment.
+
+You can create your own module to integrate with another API - refer to the `api` module for implementation details 
+and the `config` module for integration. 
+API data, after processing, is passed through the `Response` structure.
+
 <h2>Quick Start</h2>
 
 Firstly, create a file named `.env` with this structure:
