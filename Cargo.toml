@@ -1,7 +1,7 @@
 [package]
 name = "media_fetch_bot"
 authors = ["Alex Kovalov <alexkovalevkpi@gmail.com>"]
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 rust-version = "1.84"
 repository = "https://github.com/xairaven/MediaFetchBot"
