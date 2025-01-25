@@ -1,4 +1,4 @@
-FROM rust:1.82.0 AS builder
+FROM rust:latest AS builder
 
 # Copying code + .env
 WORKDIR /usr/src/app
