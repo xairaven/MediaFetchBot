@@ -29,14 +29,16 @@ pub enum Api {
 }
 
 impl Api {
-    pub fn base_url(&self) -> String {
-        match self {
-            Api::InstagramPhotos { .. } => String::from("instagram.com/p/"),
-            Api::InstagramReels { .. } => String::from("instagram.com/reel/"),
-            Api::InstagramStories { .. } => String::from("instagram.com/stories/"),
-            Api::TikTok { .. } => String::from("tiktok.com"),
-            Api::Youtube { .. } => String::from("youtube.com"),
-        }
+    pub fn matches_url(&self, link: &str) -> bool {
+        let patterns = match self {
+            Api::InstagramPhotos { .. } => vec!["instagram.com", "/p/"],
+            Api::InstagramReels { .. } => vec!["instagram.com", "reel"],
+            Api::InstagramStories { .. } => vec!["instagram.com", "stories"],
+            Api::TikTok { .. } => vec!["tiktok.com"],
+            Api::Youtube { .. } => vec!["youtube.com", "shorts"],
+        };
+
+        patterns.iter().all(|&pattern| link.contains(pattern))
     }
 
     pub fn instances_from_config(config: &BotConfig) -> Vec<Self> {

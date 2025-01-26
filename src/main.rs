@@ -50,7 +50,7 @@ async fn handle_message(
                 .await?;
             return Ok(());
         },
-        Some(value) => value,
+        Some(value) => value.trim(),
     };
 
     // Check if user whitelisted, if whitelist is enabled.
@@ -71,7 +71,7 @@ async fn handle_message(
     let api_instances = Api::instances_from_config(&bot_config);
     let instance = api_instances
         .iter()
-        .find(|instance| text.contains(&instance.base_url()));
+        .find(|instance| instance.matches_url(&text));
 
     match instance {
         Some(instance) => {
