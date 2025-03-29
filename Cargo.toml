@@ -1,6 +1,6 @@
 [package]
 name = "media_fetch_bot"
-version = "1.0.1"
+version = "1.0.2"
 authors = ["Alex Kovalov <alexkovalevkpi@gmail.com>"]
 categories = ["multimedia"]
 keywords = ["telegram", "media", "bot"]
