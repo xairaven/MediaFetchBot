@@ -5,8 +5,8 @@ use crate::error::UserOutputError;
 use rust_i18n::t;
 use std::process;
 use std::sync::Arc;
-use teloxide::adaptors::throttle::Limits;
 use teloxide::adaptors::Throttle;
+use teloxide::adaptors::throttle::Limits;
 use teloxide::{prelude::*, utils::command::BotCommands};
 
 // Defining folder with locales. Path: media_fetch_bot/locales
@@ -71,7 +71,7 @@ async fn handle_message(
     let api_instances = Api::instances_from_config(&bot_config);
     let instance = api_instances
         .iter()
-        .find(|instance| instance.matches_url(&text));
+        .find(|instance| instance.matches_url(text));
 
     match instance {
         Some(instance) => {

@@ -1,10 +1,10 @@
 use crate::error::UserOutputError;
 use crate::logger;
 use rust_i18n::t;
+use teloxide::Bot;
 use teloxide::adaptors::Throttle;
 use teloxide::prelude::{Requester, ResponseResult};
 use teloxide::types::{Message, User};
-use teloxide::Bot;
 
 type Whitelist = [u64];
 

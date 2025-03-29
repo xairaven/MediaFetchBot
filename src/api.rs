@@ -3,11 +3,11 @@ use crate::bot::config::BotConfig;
 use crate::error::Error;
 use crate::logger;
 use rust_i18n::t;
+use teloxide::Bot;
 use teloxide::adaptors::Throttle;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{Message, Requester, ResponseResult};
 use teloxide::types::{InputMedia, ParseMode};
-use teloxide::Bot;
 use thiserror::Error;
 
 mod instagram {

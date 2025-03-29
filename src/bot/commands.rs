@@ -1,11 +1,11 @@
 use rust_i18n::t;
 use strum_macros::Display;
+use teloxide::Bot;
 use teloxide::adaptors::Throttle;
 use teloxide::macros::BotCommands;
 use teloxide::payloads::SendMessageSetters;
 use teloxide::prelude::{Message, Requester, ResponseResult};
 use teloxide::types::ParseMode;
-use teloxide::Bot;
 
 #[derive(Display, BotCommands, Clone, Debug)]
 #[command(
