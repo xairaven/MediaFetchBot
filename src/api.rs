@@ -95,26 +95,20 @@ impl Api {
                 let error_text = match err {
                     Error::Server(ref specific_err) => {
                         log::error!(
-                            "{}",
-                            format!(
-                                "User: {}. Error: {}. Query: {}",
-                                logger::get_sender_identifier(msg),
-                                specific_err,
-                                link,
-                            )
+                            "User: {}. Error: {}. Query: {}",
+                            logger::get_sender_identifier(msg),
+                            specific_err,
+                            link,
                         );
 
                         format!("{}", t!(err.to_string()))
                     },
                     Error::User(specific_err) => {
                         log::warn!(
-                            "{}",
-                            format!(
-                                "User: {}. Error: {}. Query: {}",
-                                logger::get_sender_identifier(msg),
-                                specific_err,
-                                link,
-                            )
+                            "User: {}. Error: {}. Query: {}",
+                            logger::get_sender_identifier(msg),
+                            specific_err,
+                            link,
                         );
 
                         let mut message = format!("{}", t!(specific_err.to_string()));
@@ -171,10 +165,7 @@ impl Response {
             bot.send_message(msg.chat.id, title).await?;
         }
 
-        log::info!(
-            "{}",
-            format!("User: {} -> {}", logger::get_sender_identifier(msg), link)
-        );
+        log::info!("User: {} -> {}", logger::get_sender_identifier(msg), link);
 
         Ok(())
     }
